@@ -35,6 +35,7 @@ export interface ClientGalleryFolder {
   location: string;
   coverImage: string;
   photos: string[]; // List of photo URLs
+  selectedPhotos?: string[]; // Photos selected by client for album / final delivery
   canDownload: boolean;
   createdAt: string;
 }
@@ -330,6 +331,7 @@ export function getClientFolders(): ClientGalleryFolder[] {
       ...f,
       coverImage: resolveStudioPhotoUrl(f.coverImage || f.photos?.[0] || DEFAULT_PHOTOS.hero),
       photos: (f.photos || []).map(resolveStudioPhotoUrl),
+      selectedPhotos: (f.selectedPhotos || []).map(resolveStudioPhotoUrl),
     }));
   } catch (e) {
     console.error("Error reading client folders", e);
@@ -345,6 +347,7 @@ export function saveClientFolder(folder: ClientGalleryFolder): void {
     return resolveStudioPhotoUrl(sanitizeText(url, 1500));
   };
   const cleanPhotos = (folder.photos || []).map(sanitizePhoto).filter(Boolean);
+  const cleanSelected = (folder.selectedPhotos || []).map(sanitizePhoto).filter(Boolean);
   const cleanFolder: ClientGalleryFolder = {
     ...folder,
     clientId: sanitizeText(folder.clientId, 40).toUpperCase(),
@@ -355,6 +358,7 @@ export function saveClientFolder(folder: ClientGalleryFolder): void {
     location: sanitizeText(folder.location, 120),
     coverImage: sanitizePhoto(folder.coverImage || cleanPhotos[0] || DEFAULT_PHOTOS.hero),
     photos: cleanPhotos,
+    selectedPhotos: cleanSelected,
   };
   const list = getClientFolders();
   const idx = list.findIndex((f) => f.id === cleanFolder.id);
@@ -364,6 +368,42 @@ export function saveClientFolder(folder: ClientGalleryFolder): void {
     list.unshift(cleanFolder);
   }
   localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
+}
+
+export function toggleClientSelectedPhoto(
+  folderId: string,
+  photoUrl: string
+): ClientGalleryFolder | null {
+  if (!isBrowser()) return null;
+  const list = getClientFolders();
+  const idx = list.findIndex((f) => f.id === folderId);
+  if (idx < 0) return null;
+  const folder = list[idx];
+  if (!folder) return null;
+  const currentSelected = folder.selectedPhotos || [];
+  const exists = currentSelected.includes(photoUrl);
+  const nextSelected = exists
+    ? currentSelected.filter((p) => p !== photoUrl)
+    : [...currentSelected, photoUrl];
+  const updated: ClientGalleryFolder = {
+    ...folder,
+    selectedPhotos: nextSelected,
+  };
+  list[idx] = updated;
+  localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
+  return updated;
+}
+
+export function downloadStudioPhoto(photoUrl: string, fileName = "pictorial-photo.jpg"): void {
+  if (typeof document === "undefined") return;
+  const link = document.createElement("a");
+  link.href = photoUrl;
+  link.download = fileName;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 export function deleteClientFolder(id: string): void {

@@ -4,6 +4,8 @@ import {
   addStudioInquiry,
   getStudioReviews,
   addStudioReview,
+  toggleClientSelectedPhoto,
+  downloadStudioPhoto,
   type ClientGalleryFolder,
   type StudioReview,
 } from "@/lib/studio-store";
@@ -38,6 +40,8 @@ import {
   Share2,
   LogOut,
   Key,
+  Folder,
+  Check,
 } from "lucide-react";
 
 import heroImg from "@/assets/golden-embrace-hero.png";
@@ -305,6 +309,17 @@ export default function Index() {
   const [clientAuthError, setClientAuthError] = useState("");
   const [unlockedGallery, setUnlockedGallery] = useState<ClientGalleryFolder | null>(null);
   const [activeGalleryLightboxImg, setActiveGalleryLightboxImg] = useState<string | null>(null);
+  const [clientGallerySubFolder, setClientGallerySubFolder] = useState<"all" | "selected">("all");
+  const [selectionSavedNotice, setSelectionSavedNotice] = useState(false);
+
+  const handleToggleSelectPhoto = (photoUrl: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!unlockedGallery) return;
+    const updated = toggleClientSelectedPhoto(unlockedGallery.id, photoUrl);
+    if (updated) {
+      setUnlockedGallery(updated);
+    }
+  };
 
   const handleClientGalleryLogin = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -316,6 +331,8 @@ export default function Index() {
     const folder = authenticateClientGallery(clientIdInput, clientPasswordInput);
     if (folder) {
       setUnlockedGallery(folder);
+      setClientGallerySubFolder("all");
+      setSelectionSavedNotice(false);
       setClientAuthError("");
     } else {
       setClientAuthError(
@@ -2635,12 +2652,16 @@ export default function Index() {
                     <p className="text-[#C6A76A] text-sm sm:text-base font-cinzel tracking-wider mt-1">
                       {unlockedGallery.eventTitle}
                     </p>
-                    <p className="text-xs text-[#A8A49C] mt-1.5 flex items-center gap-3">
+                    <p className="text-xs text-[#A8A49C] mt-1.5 flex flex-wrap items-center gap-3">
                       <span>📅 {unlockedGallery.eventDate}</span>
                       <span>•</span>
                       <span>📍 {unlockedGallery.location}</span>
                       <span>•</span>
                       <span className="text-[#C6A76A] font-semibold">{unlockedGallery.photos.length} High-Res Photographs</span>
+                      <span>•</span>
+                      <span className="text-emerald-400 font-semibold">
+                        ✓ {(unlockedGallery.selectedPhotos || []).length} Selected for Album
+                      </span>
                     </p>
                   </div>
 
@@ -2648,12 +2669,24 @@ export default function Index() {
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       onClick={() => {
-                        // Download prompt
-                        alert("Starting download of full resolution wedding photos...");
+                        const listToDownload =
+                          clientGallerySubFolder === "selected"
+                            ? unlockedGallery.selectedPhotos || []
+                            : unlockedGallery.photos;
+                        if (listToDownload.length === 0) return;
+                        listToDownload.forEach((photoUrl, idx) => {
+                          setTimeout(() => {
+                            downloadStudioPhoto(
+                              photoUrl,
+                              `${unlockedGallery.clientId}-${clientGallerySubFolder}-photo-${idx + 1}.jpg`
+                            );
+                          }, idx * 250);
+                        });
                       }}
                       className="px-5 py-3 rounded-xl bg-[#C6A76A] hover:bg-[#E0C58F] text-[#0B0B0D] font-cinzel font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:scale-105 transition shadow-lg shadow-[#C6A76A]/20"
                     >
-                      <Download className="w-4 h-4" /> Download All
+                      <Download className="w-4 h-4" />{" "}
+                      {clientGallerySubFolder === "selected" ? "Download Selected" : "Download All"}
                     </button>
 
                     <button
@@ -2670,33 +2703,198 @@ export default function Index() {
                 </div>
               </div>
 
-              {/* Photo Masonry / Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {unlockedGallery.photos.map((photoUrl, pIdx) => (
-                  <div
-                    key={pIdx}
-                    className="group relative rounded-2xl overflow-hidden bg-[#202023] border border-[#35332F] hover:border-[#C6A76A] shadow-xl cursor-pointer aspect-[4/5]"
-                    onClick={() => setActiveGalleryLightboxImg(photoUrl)}
-                  >
-                    <img
-                      src={photoUrl}
-                      alt={`${unlockedGallery.clientName} - Photo ${pIdx + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-4">
-                      <div className="flex justify-end">
-                        <span className="p-2 rounded-full bg-black/60 backdrop-blur-md text-[#C6A76A] border border-[#35332F]">
-                          <ZoomIn className="w-4 h-4" />
-                        </span>
+              {/* CLIENT GALLERY FOLDERS BAR: All Event Photos vs Selected Photos Folder */}
+              <div className="bg-[#202023]/90 border border-[#35332F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                    {/* Folder 1: All Photos */}
+                    <button
+                      type="button"
+                      onClick={() => setClientGallerySubFolder("all")}
+                      className={`flex items-center justify-between p-4 rounded-xl border text-left transition ${
+                        clientGallerySubFolder === "all"
+                          ? "bg-[#C6A76A]/15 border-[#C6A76A] text-[#F5F0E8] shadow-md"
+                          : "bg-[#141416] border-[#35332F] text-[#B8B5AF] hover:border-[#C6A76A]/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#C6A76A]/20 border border-[#C6A76A]/40 flex items-center justify-center text-[#C6A76A]">
+                          <Folder className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-cinzel text-xs sm:text-sm font-bold uppercase tracking-wider">
+                            All Event Photos
+                          </div>
+                          <div className="text-[11px] text-[#9E9789]">
+                            ਸਾਰੀਆਂ ਫੋਟੋਆਂ • Click ✓ on photos to select
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-white">
-                        <span className="font-cinzel tracking-wider">Photo #{pIdx + 1}</span>
-                        <span className="text-[#C6A76A] text-[11px]">Click to Expand Ultra-HD</span>
+                      <span className="px-2.5 py-1 rounded-lg bg-[#0B0B0D] border border-[#35332F] font-mono text-xs font-bold text-[#C6A76A]">
+                        {unlockedGallery.photos.length}
+                      </span>
+                    </button>
+
+                    {/* Folder 2: Client Selected Photos Folder */}
+                    <button
+                      type="button"
+                      onClick={() => setClientGallerySubFolder("selected")}
+                      className={`flex items-center justify-between p-4 rounded-xl border text-left transition ${
+                        clientGallerySubFolder === "selected"
+                          ? "bg-emerald-950/40 border-emerald-500 text-[#F5F0E8] shadow-md"
+                          : "bg-[#141416] border-[#35332F] text-[#B8B5AF] hover:border-emerald-500/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                          <Folder className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-cinzel text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <span>Selected Photos Folder</span>
+                            <span className="px-1.5 py-0.5 text-[9px] rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              NEW FOLDER
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-[#9E9789]">
+                            ਚੁਣੀਆਂ ਗਈਆਂ ਫੋਟੋਆਂ ਦਾ ਫੋਲਡਰ (For Studio Owner)
+                          </div>
+                        </div>
                       </div>
+                      <span className="px-2.5 py-1 rounded-lg bg-[#0B0B0D] border border-emerald-500/40 font-mono text-xs font-bold text-emerald-400">
+                        {(unlockedGallery.selectedPhotos || []).length}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Save Selection for Studio Owner Button */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectionSavedNotice(true);
+                        setClientGallerySubFolder("selected");
+                        setTimeout(() => setSelectionSavedNotice(false), 5000);
+                      }}
+                      className="w-full md:w-auto px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Save Selected Folder ({(unlockedGallery.selectedPhotos || []).length})</span>
+                    </button>
+                  </div>
+                </div>
+
+                {selectionSavedNotice && (
+                  <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-600/60 text-emerald-200 text-xs flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>
+                        <strong>Selected Photos Folder Saved!</strong> ਤੁਹਾਡੀਆਂ ਚੁਣੀਆਂ ਗਈਆਂ ਫੋਟੋਆਂ ({(unlockedGallery.selectedPhotos || []).length}) ਇਸ ਨਵੇਂ ਫੋਲਡਰ ਵਿੱਚ ਸੇਵ ਹੋ ਗਈਆਂ ਹਨ। Studio Owner ਹੁਣ Admin ਪੈਨਲ ਤੋਂ ਇਹਨਾਂ ਨੂੰ ਸਿੱਧਾ ਡਾਊਨਲੋਡ ਕਰ ਸਕਦਾ ਹੈ।
+                      </span>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
+
+              {/* Photo Masonry / Grid */}
+              {(() => {
+                const displayedPhotos =
+                  clientGallerySubFolder === "selected"
+                    ? unlockedGallery.selectedPhotos || []
+                    : unlockedGallery.photos;
+
+                if (displayedPhotos.length === 0) {
+                  return (
+                    <div className="bg-[#202023]/70 border border-[#35332F] rounded-3xl p-12 text-center space-y-4">
+                      <div className="w-14 h-14 rounded-2xl bg-[#C6A76A]/15 border border-[#C6A76A]/40 flex items-center justify-center mx-auto text-[#C6A76A]">
+                        <Folder className="w-7 h-7" />
+                      </div>
+                      <h3 className="font-serif text-2xl text-[#F5F0E8]">
+                        No Photos in Selected Folder Yet (ਹਜੇ ਕੋਈ ਫੋਟੋ ਸਿਲੈਕਟ ਨਹੀਂ ਕੀਤੀ)
+                      </h3>
+                      <p className="text-xs text-[#9E9789] max-w-md mx-auto">
+                        "All Event Photos" ਫੋਲਡਰ ਵਿੱਚ ਜਾ ਕੇ ਆਪਣੀ ਪਸੰਦ ਦੀਆਂ ਫੋਟੋਆਂ ਉੱਪਰ <strong>"+ Select Photo"</strong> ਬਟਨ ਦਬਾਓ। ਚੁਣੀਆਂ ਹੋਈਆਂ ਫੋਟੋਆਂ ਆਪਣੇ-ਆਪ ਇਸ ਫੋਲਡਰ ਵਿੱਚ ਆ ਜਾਣਗੀਆਂ।
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setClientGallerySubFolder("all")}
+                        className="px-5 py-2.5 rounded-xl bg-[#C6A76A] text-[#0B0B0D] font-bold text-xs uppercase tracking-wider hover:bg-[#E0C58F] transition"
+                      >
+                        Go to All Event Photos
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {displayedPhotos.map((photoUrl, pIdx) => {
+                      const isSelected = (unlockedGallery.selectedPhotos || []).includes(photoUrl);
+
+                      return (
+                        <div
+                          key={pIdx}
+                          className={`group relative rounded-2xl overflow-hidden bg-[#202023] border-2 shadow-xl cursor-pointer aspect-[4/5] transition ${
+                            isSelected
+                              ? "border-emerald-500 shadow-emerald-500/10"
+                              : "border-[#35332F] hover:border-[#C6A76A]"
+                          }`}
+                          onClick={() => setActiveGalleryLightboxImg(photoUrl)}
+                        >
+                          <img
+                            src={photoUrl}
+                            alt={`${unlockedGallery.clientName} - Photo ${pIdx + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                          />
+
+                          {/* Always-visible Top Controls: Select Photo Toggle & Quick Download */}
+                          <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => handleToggleSelectPhoto(photoUrl, e)}
+                              className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-md transition ${
+                                isSelected
+                                  ? "bg-emerald-600 text-white border border-emerald-400"
+                                  : "bg-black/75 hover:bg-[#C6A76A] text-white hover:text-[#0B0B0D] border border-white/25"
+                              }`}
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>{isSelected ? "Selected in Folder" : "+ Select Photo"}</span>
+                            </button>
+
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadStudioPhoto(
+                                    photoUrl,
+                                    `${unlockedGallery.clientId}-photo-${pIdx + 1}.jpg`
+                                  );
+                                }}
+                                className="p-2 rounded-full bg-black/75 hover:bg-[#C6A76A] text-white hover:text-[#0B0B0D] border border-white/20 backdrop-blur-md transition"
+                                title="Download Photo"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                              </button>
+                              <span className="p-2 rounded-full bg-black/60 backdrop-blur-md text-[#C6A76A] border border-[#35332F]">
+                                <ZoomIn className="w-3.5 h-3.5" />
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 flex items-center justify-between text-xs text-white">
+                            <span className="font-cinzel tracking-wider">Photo #{pIdx + 1}</span>
+                            <span className="text-[#C6A76A] text-[11px]">
+                              {isSelected ? "✓ In Selected Folder" : "Click to Expand"}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
@@ -2724,16 +2922,36 @@ export default function Index() {
                 className="max-h-[80vh] w-auto max-w-full rounded-xl object-contain shadow-2xl border border-[#35332F]"
               />
 
-              <div className="mt-4 flex items-center gap-4">
-                <a
-                  href={activeGalleryLightboxImg}
-                  download="pictorial-photography.jpg"
-                  target="_blank"
-                  rel="noreferrer"
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                {unlockedGallery && (
+                  <button
+                    type="button"
+                    onClick={() => handleToggleSelectPhoto(activeGalleryLightboxImg)}
+                    className={`px-5 py-2.5 rounded-full font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
+                      (unlockedGallery.selectedPhotos || []).includes(activeGalleryLightboxImg)
+                        ? "bg-emerald-600 text-white border border-emerald-400"
+                        : "bg-[#202023] hover:bg-emerald-600 text-white border border-[#35332F]"
+                    }`}
+                  >
+                    <Check className="w-4 h-4" />
+                    {(unlockedGallery.selectedPhotos || []).includes(activeGalleryLightboxImg)
+                      ? "✓ Added to Selected Folder (Click to Remove)"
+                      : "+ Add to Selected Photos Folder"}
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    downloadStudioPhoto(
+                      activeGalleryLightboxImg,
+                      `${unlockedGallery?.clientId || "pictorial"}-photo.jpg`
+                    )
+                  }
                   className="px-5 py-2.5 rounded-full bg-[#C6A76A] hover:bg-[#E0C58F] text-[#0B0B0D] font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition"
                 >
                   <Download className="w-4 h-4" /> Download Ultra-HD File
-                </a>
+                </button>
               </div>
             </div>
           </div>
