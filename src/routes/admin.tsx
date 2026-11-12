@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect, useId, useRef } from "react";
 import {
   Calendar as CalendarIcon,
   Folder,
@@ -40,6 +40,7 @@ import {
 
 import {
   ADMIN_CREDENTIALS,
+  DEFAULT_PHOTOS,
   isAdminAuthenticated,
   setAdminAuthenticated,
   getStudioBookings,
@@ -135,6 +136,8 @@ export default function AdminPortal() {
     photos: [],
   });
   const [newPhotoUrl, setNewPhotoUrl] = useState("");
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
+  const photoFileInputRef = useRef<HTMLInputElement | null>(null);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -354,12 +357,12 @@ export default function AdminPortal() {
       eventTitle: "Royal Anand Karaj & Reception",
       eventDate: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
       location: "Mansa, Punjab",
-      coverImage: "/src/assets/golden-embrace-hero.png",
+      coverImage: DEFAULT_PHOTOS.hero,
       photos: [
-        "/src/assets/golden-embrace-hero.png",
-        "/src/assets/bride.jpg",
-        "/src/assets/prewedding.jpg",
-        "/src/assets/cinema.jpg",
+        DEFAULT_PHOTOS.hero,
+        DEFAULT_PHOTOS.bride,
+        DEFAULT_PHOTOS.prewedding,
+        DEFAULT_PHOTOS.cinema,
       ],
       canDownload: true,
       createdAt: new Date().toISOString().split("T")[0] as string,
@@ -390,8 +393,8 @@ export default function AdminPortal() {
       eventTitle: folderForm.eventTitle || "Wedding Gallery",
       eventDate: folderForm.eventDate || "",
       location: folderForm.location || "Mansa, Punjab",
-      coverImage: folderForm.coverImage || folderForm.photos?.[0] || "/src/assets/golden-embrace-hero.png",
-      photos: folderForm.photos && folderForm.photos.length > 0 ? folderForm.photos : ["/src/assets/golden-embrace-hero.png"],
+      coverImage: folderForm.coverImage || folderForm.photos?.[0] || DEFAULT_PHOTOS.hero,
+      photos: folderForm.photos && folderForm.photos.length > 0 ? folderForm.photos : [DEFAULT_PHOTOS.hero],
       canDownload: folderForm.canDownload ?? true,
       createdAt: folderForm.createdAt || (new Date().toISOString().split("T")[0] as string),
     };
@@ -408,8 +411,81 @@ export default function AdminPortal() {
     }
   };
 
+  // Compress & convert selected Phone Gallery / PC Image files into high-quality Data URLs
+  const compressImageFile = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const resultStr = ev.target?.result as string;
+        if (!resultStr) return reject(new Error("Empty file"));
+        const img = new window.Image();
+        img.onload = () => {
+          const maxDim = 1280;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return resolve(resultStr);
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.onerror = () => resolve(resultStr);
+        img.src = resultStr;
+      };
+      reader.onerror = () => reject(new Error("File read error"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleDevicePhotosSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+    setIsUploadingPhotos(true);
+    try {
+      const filesArray = Array.from(fileList);
+      const dataUrls: string[] = [];
+      for (const file of filesArray) {
+        if (file.type.startsWith("image/")) {
+          const compressed = await compressImageFile(file);
+          dataUrls.push(compressed);
+        }
+      }
+      if (dataUrls.length > 0) {
+        setFolderForm((prev) => {
+          const existing = prev.photos || [];
+          const updatedPhotos = [...existing, ...dataUrls];
+          return {
+            ...prev,
+            coverImage: prev.coverImage || updatedPhotos[0] || DEFAULT_PHOTOS.hero,
+            photos: updatedPhotos,
+          };
+        });
+      }
+    } catch (err) {
+      console.error("Error adding photos from device:", err);
+    } finally {
+      setIsUploadingPhotos(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
   const handleAddPhotoToForm = () => {
-    if (!newPhotoUrl.trim()) return;
+    // If no URL is typed, clicking "+ ਸ਼ਾਮਲ ਕਰੋ" directly opens Phone Gallery / PC File Picker!
+    if (!newPhotoUrl.trim()) {
+      photoFileInputRef.current?.click();
+      return;
+    }
     const current = folderForm.photos || [];
     setFolderForm({
       ...folderForm,
@@ -1186,7 +1262,7 @@ export default function AdminPortal() {
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                         onError={(e) => {
                           // Fallback placeholder
-                          (e.target as any).src = "/src/assets/golden-embrace-hero.png";
+                          (e.target as any).src = DEFAULT_PHOTOS.hero;
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/40 to-transparent" />
@@ -1283,7 +1359,7 @@ export default function AdminPortal() {
                             alt=""
                             className="w-12 h-12 object-cover rounded-md border border-[#35332F] shrink-0"
                             onError={(e) => {
-                              (e.target as any).src = "/src/assets/golden-embrace-hero.png";
+                              (e.target as any).src = DEFAULT_PHOTOS.hero;
                             }}
                           />
                         ))}
@@ -1732,22 +1808,47 @@ export default function AdminPortal() {
               <div className="p-3.5 bg-[#0B0B0D] rounded-xl border border-[#35332F] space-y-3">
                 <p className="font-semibold text-[#F5F0E8] flex items-center justify-between">
                   <span>ਫੋਟੋਆਂ ਸ਼ਾਮਲ ਕਰੋ (Photos in this Folder - {folderForm.photos?.length || 0})</span>
-                  <span className="text-[11px] text-[#B8B5AF] font-normal">ਕਵਰ ਜਾਂ ਫੋਟੋ ਲਿੰਕ</span>
+                  <span className="text-[11px] text-[#B8B5AF] font-normal">ਫੋਨ ਗੈਲਰੀ / ਕੰਪਿਊਟਰ ਜਾਂ ਲਿੰਕ</span>
                 </p>
 
-                {/* Add Photo Input */}
+                {/* Hidden File Input for Phone Gallery & PC File Explorer */}
+                <input
+                  ref={photoFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleDevicePhotosSelected}
+                />
+
+                {/* Direct Upload Button from Phone Gallery / PC */}
+                <button
+                  type="button"
+                  onClick={() => photoFileInputRef.current?.click()}
+                  disabled={isUploadingPhotos}
+                  className="w-full py-2.5 px-4 rounded-xl border border-dashed border-[#C6A76A] bg-[#C6A76A]/15 hover:bg-[#C6A76A] text-[#C6A76A] hover:text-[#0B0B0D] font-semibold text-xs flex items-center justify-center gap-2 transition shadow-sm"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  <span>
+                    {isUploadingPhotos
+                      ? "ਫੋਟੋਆਂ ਲੋਡ ਹੋ ਰਹੀਆਂ ਹਨ... (Uploading Photos...)"
+                      : "📷 ਫੋਨ ਗੈਲਰੀ ਜਾਂ ਕੰਪਿਊਟਰ ਵਿੱਚੋਂ ਫੋਟੋਆਂ ਚੁਣੋ (+ Select from Phone / PC)"}
+                  </span>
+                </button>
+
+                {/* Add Photo Input (or click + ਸ਼ਾਮਲ ਕਰੋ to open Gallery/Files) */}
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={newPhotoUrl}
                     onChange={(e) => setNewPhotoUrl(e.target.value)}
-                    placeholder="Paste image URL (e.g. /src/assets/bride.jpg or web URL)"
+                    placeholder="ਜਾਂ ਫੋਟੋ ਲਿੰਕ ਪੇਸਟ ਕਰੋ (Or paste image URL / click + ਸ਼ਾਮਲ ਕਰੋ)"
                     className="flex-1 bg-[#202023] border border-[#35332F] rounded-lg px-3 py-2 text-[#F5F0E8] text-xs outline-none focus:border-[#C6A76A]"
                   />
                   <button
                     type="button"
                     onClick={handleAddPhotoToForm}
-                    className="px-3 py-2 bg-[#171719] hover:bg-[#C6A76A] hover:text-[#0B0B0D] text-[#F5F0E8] rounded-lg font-medium transition"
+                    className="px-3 py-2 bg-[#171719] hover:bg-[#C6A76A] hover:text-[#0B0B0D] text-[#F5F0E8] rounded-lg font-medium transition shrink-0"
                   >
                     + ਸ਼ਾਮਲ ਕਰੋ
                   </button>
@@ -1757,11 +1858,11 @@ export default function AdminPortal() {
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
                   <span className="text-[10px] text-[#B8B5AF]">ਸਟੂਡੀਓ ਨਮੂਨੇ:</span>
                   {[
-                    { label: "Hero Wedding", url: "/src/assets/golden-embrace-hero.png" },
-                    { label: "Bridal", url: "/src/assets/bride.jpg" },
-                    { label: "Pre-Wedding", url: "/src/assets/prewedding.jpg" },
-                    { label: "Cinema", url: "/src/assets/cinema.jpg" },
-                    { label: "Ring", url: "/src/assets/ring.jpg" },
+                    { label: "Hero Wedding", url: DEFAULT_PHOTOS.hero },
+                    { label: "Bridal", url: DEFAULT_PHOTOS.bride },
+                    { label: "Pre-Wedding", url: DEFAULT_PHOTOS.prewedding },
+                    { label: "Cinema", url: DEFAULT_PHOTOS.cinema },
+                    { label: "Ring", url: DEFAULT_PHOTOS.ring },
                   ].map((preset) => (
                     <button
                       key={preset.label}
@@ -1791,7 +1892,7 @@ export default function AdminPortal() {
                         alt=""
                         className="w-16 h-16 object-cover rounded-lg border border-[#35332F]"
                         onError={(e) => {
-                          (e.target as any).src = "/src/assets/golden-embrace-hero.png";
+                          (e.target as any).src = DEFAULT_PHOTOS.hero;
                         }}
                       />
                       <button

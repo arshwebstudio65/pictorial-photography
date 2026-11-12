@@ -1,4 +1,12 @@
 // Pictorial Photography Studio Store & Database (Mansa, Punjab)
+import heroAsset from "@/assets/golden-embrace-hero.png";
+import preweddingAsset from "@/assets/prewedding.jpg";
+import brideAsset from "@/assets/bride.jpg";
+import cinemaAsset from "@/assets/cinema.jpg";
+import ringAsset from "@/assets/ring.jpg";
+import albumAsset from "@/assets/album.jpg";
+import editingAsset from "@/assets/editing.jpg";
+import birthdayAsset from "@/assets/birthday.jpg";
 
 export interface BookingEvent {
   id: string;
@@ -59,17 +67,32 @@ const STORAGE_KEYS = {
   ADMIN_AUTH: "pictorial_admin_session_v1",
 };
 
-// Default Sample Wedding Photos
-const DEFAULT_PHOTOS = {
-  hero: "/src/assets/golden-embrace-hero.png",
-  prewedding: "/src/assets/prewedding.jpg",
-  bride: "/src/assets/bride.jpg",
-  cinema: "/src/assets/cinema.jpg",
-  ring: "/src/assets/ring.jpg",
-  album: "/src/assets/album.jpg",
-  editing: "/src/assets/editing.jpg",
-  birthday: "/src/assets/birthday.jpg",
+// Default Sample Wedding Photos (Bundled URLs for both Local & Vercel Production)
+export const DEFAULT_PHOTOS = {
+  hero: heroAsset,
+  prewedding: preweddingAsset,
+  bride: brideAsset,
+  cinema: cinemaAsset,
+  ring: ringAsset,
+  album: albumAsset,
+  editing: editingAsset,
+  birthday: birthdayAsset,
 };
+
+export function resolveStudioPhotoUrl(url: string): string {
+  if (!url) return DEFAULT_PHOTOS.hero;
+  const legacyMap: Record<string, string> = {
+    "/src/assets/golden-embrace-hero.png": DEFAULT_PHOTOS.hero,
+    "/src/assets/prewedding.jpg": DEFAULT_PHOTOS.prewedding,
+    "/src/assets/bride.jpg": DEFAULT_PHOTOS.bride,
+    "/src/assets/cinema.jpg": DEFAULT_PHOTOS.cinema,
+    "/src/assets/ring.jpg": DEFAULT_PHOTOS.ring,
+    "/src/assets/album.jpg": DEFAULT_PHOTOS.album,
+    "/src/assets/editing.jpg": DEFAULT_PHOTOS.editing,
+    "/src/assets/birthday.jpg": DEFAULT_PHOTOS.birthday,
+  };
+  return legacyMap[url] || url;
+}
 
 const DEFAULT_BOOKINGS: BookingEvent[] = [
   {
@@ -302,7 +325,12 @@ export function getClientFolders(): ClientGalleryFolder[] {
       localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(DEFAULT_FOLDERS));
       return DEFAULT_FOLDERS;
     }
-    return JSON.parse(raw);
+    const parsed: ClientGalleryFolder[] = JSON.parse(raw);
+    return parsed.map((f) => ({
+      ...f,
+      coverImage: resolveStudioPhotoUrl(f.coverImage || f.photos?.[0] || DEFAULT_PHOTOS.hero),
+      photos: (f.photos || []).map(resolveStudioPhotoUrl),
+    }));
   } catch (e) {
     console.error("Error reading client folders", e);
     return DEFAULT_FOLDERS;
@@ -311,6 +339,12 @@ export function getClientFolders(): ClientGalleryFolder[] {
 
 export function saveClientFolder(folder: ClientGalleryFolder): void {
   if (!isBrowser()) return;
+  const sanitizePhoto = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("data:image/")) return url;
+    return resolveStudioPhotoUrl(sanitizeText(url, 1500));
+  };
+  const cleanPhotos = (folder.photos || []).map(sanitizePhoto).filter(Boolean);
   const cleanFolder: ClientGalleryFolder = {
     ...folder,
     clientId: sanitizeText(folder.clientId, 40).toUpperCase(),
@@ -319,7 +353,8 @@ export function saveClientFolder(folder: ClientGalleryFolder): void {
     eventTitle: sanitizeText(folder.eventTitle, 150),
     eventDate: sanitizeText(folder.eventDate, 60),
     location: sanitizeText(folder.location, 120),
-    photos: (folder.photos || []).map((url) => sanitizeText(url, 500)).filter(Boolean),
+    coverImage: sanitizePhoto(folder.coverImage || cleanPhotos[0] || DEFAULT_PHOTOS.hero),
+    photos: cleanPhotos,
   };
   const list = getClientFolders();
   const idx = list.findIndex((f) => f.id === cleanFolder.id);
