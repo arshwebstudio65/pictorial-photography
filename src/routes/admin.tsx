@@ -144,7 +144,7 @@ export default function AdminPortal() {
     if (auth) {
       setIsAuthenticated(true);
       loadData();
-      return;
+      return undefined;
     }
 
     // Check if accessed via Secret URL Hash (#pictorial-mansa-2580)
@@ -160,6 +160,7 @@ export default function AdminPortal() {
       window.addEventListener("hashchange", checkHash);
       return () => window.removeEventListener("hashchange", checkHash);
     }
+    return undefined;
   }, []);
 
   const loadData = () => {
@@ -726,7 +727,7 @@ export default function AdminPortal() {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
         {/* KPI Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="admin-kpi-card bg-[#202023]/80 border border-[#35332F]/90 rounded-xl p-4 flex items-center justify-between shadow-sm">
             <div>
               <p className="text-[11px] uppercase tracking-wider text-[#B8B5AF] font-medium">
@@ -739,51 +740,6 @@ export default function AdminPortal() {
             </div>
             <div className="w-10 h-10 rounded-lg bg-[#171719] flex items-center justify-center text-[#C6A76A]">
               <CalendarIcon className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="admin-kpi-card bg-[#202023]/80 border border-[#35332F]/90 rounded-xl p-4 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-[#B8B5AF] font-medium">
-                ਕੁੱਲ ਰੈਵਨਿਊ (Total Value)
-              </p>
-              <p className="text-2xl font-bold font-serif text-[#C6A76A] mt-1">
-                ₹{(totalRevenue / 100000).toFixed(2)}L
-              </p>
-              <p className="text-[11px] text-[#B8B5AF] mt-0.5">₹{totalRevenue.toLocaleString("en-IN")}</p>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-[#C6A76A]/10 flex items-center justify-center text-[#C6A76A]">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="admin-kpi-card bg-[#202023]/80 border border-[#35332F]/90 rounded-xl p-4 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-emerald-400/90 font-medium">
-                ਐਡਵਾਂਸ ਪ੍ਰਾਪਤ (Advance Paid)
-              </p>
-              <p className="text-2xl font-bold font-serif text-emerald-400 mt-1">
-                ₹{(totalAdvance / 100000).toFixed(2)}L
-              </p>
-              <p className="text-[11px] text-[#B8B5AF] mt-0.5">₹{totalAdvance.toLocaleString("en-IN")}</p>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-emerald-950/40 border border-emerald-800/30 flex items-center justify-center text-emerald-400">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="admin-kpi-card bg-[#202023]/80 border border-[#35332F]/90 rounded-xl p-4 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-amber-400/90 font-medium">
-                ਬਾਕੀ ਬਕਾਇਆ (Balance Due)
-              </p>
-              <p className="text-2xl font-bold font-serif text-amber-400 mt-1">
-                ₹{(totalBalanceDue / 100000).toFixed(2)}L
-              </p>
-              <p className="text-[11px] text-[#B8B5AF] mt-0.5">₹{totalBalanceDue.toLocaleString("en-IN")}</p>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-amber-950/40 border border-amber-800/30 flex items-center justify-center text-amber-400">
-              <Clock className="w-5 h-5" />
             </div>
           </div>
         </div>

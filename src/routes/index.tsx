@@ -937,7 +937,7 @@ export default function Index() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16">
             {/* Left Big Portrait: Bride & Groom full-length wedding shot */}
             <div
-              onClick={() => setSelectedServiceModal(curatedServices[0])}
+              onClick={() => setSelectedServiceModal(curatedServices[0] ?? null)}
               className="service-featured-card lg:col-span-6 relative h-[520px] sm:h-[620px] lg:h-[700px] overflow-hidden group cursor-pointer bg-[#0B0B0D] rounded-2xl border border-[#35332F] shadow-2xl hover:border-[#C6A76A]/60 transition-all"
             >
               <img
@@ -971,7 +971,7 @@ export default function Index() {
               {/* 2-Photo Split Row */}
               <div className="grid grid-cols-2 gap-4 sm:gap-6">
                 <div
-                  onClick={() => setSelectedServiceModal(curatedServices[1])}
+                  onClick={() => setSelectedServiceModal(curatedServices[1] ?? null)}
                   className="relative h-64 sm:h-72 overflow-hidden group cursor-pointer bg-[#0B0B0D] rounded-2xl border border-[#35332F] shadow-xl hover:border-[#C6A76A]/60 transition-all"
                 >
                   <img
@@ -987,7 +987,7 @@ export default function Index() {
                 </div>
 
                 <div
-                  onClick={() => setSelectedServiceModal(curatedServices[2])}
+                  onClick={() => setSelectedServiceModal(curatedServices[2] ?? null)}
                   className="relative h-64 sm:h-72 overflow-hidden group cursor-pointer bg-[#0B0B0D] rounded-2xl border border-[#35332F] shadow-xl hover:border-[#C6A76A]/60 transition-all"
                 >
                   <img
@@ -1086,7 +1086,7 @@ export default function Index() {
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  onClick={() => setSelectedServiceModal(item.srv)}
+                  onClick={() => setSelectedServiceModal(item.srv ?? null)}
                   className="service-photo-card group relative h-56 sm:h-72 overflow-hidden cursor-pointer rounded-2xl bg-[#0B0B0D] border border-[#35332F] hover:border-[#C6A76A]/60 shadow-xl transition-all"
                 >
                   <img
@@ -1502,7 +1502,7 @@ export default function Index() {
                     <ChevronLeft className="w-4 h-4" /> Back to Visual Hub
                   </button>
                   <h3 className="font-serif text-2xl sm:text-3xl text-[#F5F0E8]">
-                    {weddingSlides[weddingSlideIndex].subtitle}
+                    {weddingSlides[weddingSlideIndex]?.subtitle}
                   </h3>
                 </div>
 
@@ -1516,7 +1516,7 @@ export default function Index() {
                     <ChevronLeft className="w-4 h-4 text-[#C6A76A]" /> PREVIOUS
                   </button>
                   <span className="font-cinzel text-xs text-[#C6A76A] px-2 font-bold">
-                    {weddingSlides[weddingSlideIndex].slideNumber} / 0{weddingSlides.length}
+                    {weddingSlides[weddingSlideIndex]?.slideNumber} / 0{weddingSlides.length}
                   </span>
                   <button
                     type="button"
@@ -1530,7 +1530,7 @@ export default function Index() {
 
               {/* 3 Vertical Sliding Frames side-by-side matching the Freya template */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-                {weddingSlides[weddingSlideIndex].photos.map((photo, pIdx) => (
+                {(weddingSlides[weddingSlideIndex]?.photos ?? []).map((photo, pIdx) => (
                   <div
                     key={pIdx}
                     onClick={() =>

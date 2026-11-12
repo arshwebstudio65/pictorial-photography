@@ -230,6 +230,16 @@ function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof localStorage !== "undefined";
 }
 
+// Security helper: sanitize text inputs to prevent script/HTML injection
+export function sanitizeText(input: string, maxLength = 500): string {
+  if (!input) return "";
+  return String(input)
+    .replace(/[<>]/g, "")
+    .replace(/javascript:/gi, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
 // BOOKINGS
 export function getStudioBookings(): BookingEvent[] {
   if (!isBrowser()) return DEFAULT_BOOKINGS;
@@ -248,12 +258,21 @@ export function getStudioBookings(): BookingEvent[] {
 
 export function saveStudioBooking(booking: BookingEvent): void {
   if (!isBrowser()) return;
+  const cleanBooking: BookingEvent = {
+    ...booking,
+    clientName: sanitizeText(booking.clientName, 120),
+    phone: sanitizeText(booking.phone, 30),
+    venue: sanitizeText(booking.venue, 200),
+    package: sanitizeText(booking.package, 120),
+    crew: sanitizeText(booking.crew, 200),
+    notes: booking.notes ? sanitizeText(booking.notes, 500) : "",
+  };
   const list = getStudioBookings();
-  const idx = list.findIndex((b) => b.id === booking.id);
+  const idx = list.findIndex((b) => b.id === cleanBooking.id);
   if (idx >= 0) {
-    list[idx] = booking;
+    list[idx] = cleanBooking;
   } else {
-    list.unshift(booking);
+    list.unshift(cleanBooking);
   }
   localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(list));
 }
@@ -282,12 +301,22 @@ export function getClientFolders(): ClientGalleryFolder[] {
 
 export function saveClientFolder(folder: ClientGalleryFolder): void {
   if (!isBrowser()) return;
+  const cleanFolder: ClientGalleryFolder = {
+    ...folder,
+    clientId: sanitizeText(folder.clientId, 40).toUpperCase(),
+    password: sanitizeText(folder.password, 60),
+    clientName: sanitizeText(folder.clientName, 120),
+    eventTitle: sanitizeText(folder.eventTitle, 150),
+    eventDate: sanitizeText(folder.eventDate, 60),
+    location: sanitizeText(folder.location, 120),
+    photos: (folder.photos || []).map((url) => sanitizeText(url, 500)).filter(Boolean),
+  };
   const list = getClientFolders();
-  const idx = list.findIndex((f) => f.id === folder.id);
+  const idx = list.findIndex((f) => f.id === cleanFolder.id);
   if (idx >= 0) {
-    list[idx] = folder;
+    list[idx] = cleanFolder;
   } else {
-    list.unshift(folder);
+    list.unshift(cleanFolder);
   }
   localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
 }
@@ -327,7 +356,11 @@ export function getStudioInquiries(): StudioInquiry[] {
 
 export function addStudioInquiry(inquiry: Omit<StudioInquiry, "id" | "createdAt" | "status">): StudioInquiry {
   const newInq: StudioInquiry = {
-    ...inquiry,
+    name: sanitizeText(inquiry.name, 100),
+    phone: sanitizeText(inquiry.phone, 30),
+    eventType: sanitizeText(inquiry.eventType, 80),
+    eventDate: sanitizeText(inquiry.eventDate, 40),
+    message: sanitizeText(inquiry.message, 1000),
     id: "inq-" + Date.now(),
     createdAt: new Date().toISOString().split("T")[0] as string,
     status: "New",
