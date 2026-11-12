@@ -1,0 +1,1576 @@
+/*
+ * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
+ * - Keep every @import in this top block, above @theme and the rest of the file. Install an
+ *   npm package before @importing its CSS. Never @import a remote URL (web fonts, CDN CSS): the
+ *   build resolves @import from the filesystem. Load those with a <link> in the head() of
+ *   src/routes/__root.tsx and name the family in a --font-* token in @theme inline below.
+ */
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The design lives in this file: oklch color tokens on the shadcn variables
+ * (--background, --foreground, --primary, --secondary, --muted, --accent, ...) plus
+ * new tokens as needed, font tokens, and custom styles and animations.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    background-color: #0B0B0D;
+    color: #F5F0E8;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.015em;
+  }
+
+  h1, h2, h3, h4, .font-serif, .font-serif-luxury {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: 0.02em;
+  }
+
+  .font-cinzel {
+    font-family: 'Cinzel', serif;
+  }
+}
+
+/* Luxury Studio Design Utilities & Professional Color Tokens */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFF9EE 0%, #F5DFAC 35%, #E5C478 70%, #B88E30 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-luminous {
+  color: #E5C478;
+}
+
+.text-gold-bright {
+  color: #F3D798;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #F5DFAC 0%, #E5C478 50%, #C99A32 100%);
+}
+
+.bg-studio-dark {
+  background-color: #120F0D;
+}
+
+.bg-studio-surface {
+  background: linear-gradient(180deg, #1C1713 0%, #14100E 100%);
+}
+
+.border-gold-subtle {
+  border-color: rgba(229, 196, 120, 0.2);
+}
+
+.border-gold-card {
+  border: 1px solid rgba(229, 196, 120, 0.18);
+}
+
+.gold-glow-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gold-glow-hover:hover {
+  border-color: rgba(229, 196, 120, 0.55);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.75), 0 0 24px rgba(229, 196, 120, 0.18);
+  transform: translateY(-4px);
+}
+
+/* Ambient Radial Glow for Sections */
+.ambient-glow-top {
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(229, 196, 120, 0.07), transparent 70%);
+}
+
+/* ========================================================
+   Midnight Black + Champagne Gold Luxury Palette
+   Main Background:      #0B0B0D
+   Secondary Background: #171719
+   Card Background:      #202023
+   Champagne Gold:       #C6A76A
+   Light Gold Hover:     #E0C58F
+   Primary Text:         #F5F0E8
+   Secondary Text:       #B8B5AF
+   Subtle Borders:       #35332F
+   ======================================================== */
+
+.bg-midnight-main {
+  background-color: #0B0B0D !important;
+}
+
+.bg-midnight-sec {
+  background-color: #171719 !important;
+}
+
+.bg-midnight-card {
+  background-color: #202023 !important;
+}
+
+.text-gold-champagne {
+  color: #C6A76A !important;
+}
+
+.text-gold-hover:hover {
+  color: #E0C58F !important;
+}
+
+.text-warm-white {
+  color: #F5F0E8 !important;
+}
+
+.text-secondary-muted {
+  color: #B8B5AF !important;
+}
+
+.border-subtle {
+  border-color: #35332F !important;
+}
+
+/* Primary Button */
+.btn-gold-primary {
+  background-color: #C6A76A !important;
+  color: #0B0B0D !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-gold-primary:hover {
+  background-color: #E0C58F !important;
+  box-shadow: 0 4px 20px rgba(198, 167, 106, 0.35) !important;
+}
+
+/* Secondary Button */
+.btn-gold-secondary {
+  background-color: transparent !important;
+  border: 1px solid #C6A76A !important;
+  color: #F5F0E8 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-gold-secondary:hover {
+  border-color: #E0C58F !important;
+  color: #E0C58F !important;
+  background-color: rgba(198, 167, 106, 0.1) !important;
+}
+
+/* ========================================================
+   LIGHT / WHITE THEME OVERRIDES (BLACK & WHITE THEME TOGGLE)
+   - Professional Editorial Ivory & Gold Architecture
+   - Crystal Clear Background & Portrait Photography (Zero Bleached Fog!)
+   - High Contrast, Razor Sharp Typography
+   - ALL Dark Boxes & Gradients transformed into Crisp Ivory/White Cards
+   - ALL Photo Card Overlays maintain 100% White & Gold Text
+   ======================================================== */
+
+.theme-light, html.theme-light body {
+  background-color: #FAF8F5 !important;
+  color: #171412 !important;
+}
+
+/* --------------------------------------------------------
+   A. SECTION BACKGROUNDS IN LIGHT MODE
+   -------------------------------------------------------- */
+.theme-light #services,
+.theme-light #about,
+.theme-light #reviews,
+.theme-light #contact {
+  background-color: #F8F6F2 !important;
+}
+
+.theme-light #portfolio,
+.theme-light #why-us,
+.theme-light #client-gallery {
+  background-color: #FFFFFF !important;
+}
+
+/* --------------------------------------------------------
+   B. TOP NOTIFICATION BAR & HEADER
+   -------------------------------------------------------- */
+.theme-light .top-notification-bar {
+  background-color: #171412 !important;
+  color: #E2DBD0 !important;
+  border-bottom-color: #2D2722 !important;
+}
+.theme-light .top-notification-bar a,
+.theme-light .top-notification-bar span.text-\[\#C6A76A\] {
+  color: #E0C58F !important;
+}
+
+.theme-light header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-bottom-color: #E2DBD0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.theme-light nav a {
+  color: #4A433A !important;
+}
+.theme-light nav a:hover {
+  color: #946F2E !important;
+}
+
+.theme-dark .studio-logo-title {
+  background: linear-gradient(to right, #FFFFFF 0%, #F7E7C4 50%, #C6A76A 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 2px 10px rgba(198, 167, 106, 0.35)) !important;
+}
+
+.theme-light .studio-logo-title {
+  color: #171412 !important;
+  background: none !important;
+  -webkit-text-fill-color: #171412 !important;
+  filter: none !important;
+}
+
+.theme-light .studio-logo-subline span {
+  color: #8C6623 !important;
+}
+
+/* --------------------------------------------------------
+   C. HERO SECTION IN LIGHT MODE - TRANSPARENT OVERLAY (PHOTO FULLY VISIBLE THROUGH TEXT)
+   - Background picture is 100% visible through the text across the entire section
+   - Transparent gentle light scrim between text and photo (zero opaque blocking)
+   - Deep luxury charcoal & gold text with clean white contrast halo for 100% readability
+   - Couple is 100% natural, crisp and untouched on the right
+   -------------------------------------------------------- */
+.theme-light #home {
+  background-color: transparent !important;
+  color: #171412 !important;
+}
+
+.theme-light .hero-content-box,
+.theme-light #home .hero-content-box {
+  background: transparent !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Typography in Light Mode Hero - Deep Luxury Charcoal with White Clarity Halo */
+.theme-light #home h1 {
+  color: #171412 !important;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.98), 0 2px 4px rgba(255, 255, 255, 0.95), 0 0 10px rgba(255, 255, 255, 0.9) !important;
+  filter: none !important;
+}
+
+.theme-light #home h1 .italic,
+.theme-light #home .italic {
+  color: #946F2E !important;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.98), 0 2px 4px rgba(255, 255, 255, 0.95), 0 0 10px rgba(255, 255, 255, 0.9) !important;
+  filter: none !important;
+}
+
+.theme-light #home p {
+  color: #1F1B18 !important;
+  font-weight: 450 !important;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.98), 0 1px 3px rgba(255, 255, 255, 0.95) !important;
+  filter: none !important;
+}
+
+/* Studio Badge in Light Mode Hero - Semi-Transparent Glass Pill */
+.theme-light #home .hero-studio-badge {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-color: #946F2E !important;
+  color: #946F2E !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Metrics in Light Mode Hero */
+.theme-light #home .border-\[\#35332F\] {
+  border-color: rgba(148, 111, 46, 0.35) !important;
+}
+
+.theme-light #home .hero-metric-number {
+  color: #946F2E !important;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.98), 0 1px 3px rgba(255, 255, 255, 0.9) !important;
+}
+
+.theme-light #home .hero-metric-label {
+  color: #24201C !important;
+  font-weight: 600 !important;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.98), 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Action Buttons in Light Mode Hero */
+.theme-light #home a.bg-\[\#C6A76A\] {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px -5px rgba(148, 111, 46, 0.4) !important;
+}
+
+.theme-light #home a.bg-\[\#C6A76A\]:hover {
+  background-color: #7D5C22 !important;
+  color: #FFFFFF !important;
+}
+
+.theme-light #home a.border-\[\#C6A76A\] {
+  color: #171412 !important;
+  border-color: #946F2E !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+}
+
+.theme-light #home a.border-\[\#C6A76A\]:hover {
+  background-color: #FAF4EB !important;
+  border-color: #7D5C22 !important;
+  color: #171412 !important;
+}
+
+.theme-light #home a.border-\[\#C6A76A\] svg {
+  color: #946F2E !important;
+}
+
+/* Transparent Overlays in Light Mode:
+   - High transparency everywhere so the photo is 100% visible through the text!
+   - Soft 50% max opacity fade on the left, fading to completely 0% transparent on the right
+*/
+.theme-light #home .hero-side-overlay {
+  display: block !important;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.38) 32%,
+    rgba(255, 255, 255, 0.15) 55%,
+    rgba(255, 255, 255, 0) 72%,
+    transparent 100%
+  ) !important;
+  opacity: 1 !important;
+}
+
+.theme-light #home .hero-mobile-overlay {
+  display: block !important;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.1) 68%,
+    transparent 85%
+  ) !important;
+  opacity: 1 !important;
+}
+
+.theme-light #home .hero-top-overlay {
+  display: block !important;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%) !important;
+  height: 4rem !important;
+  opacity: 1 !important;
+}
+
+.theme-light #home .hero-bottom-overlay {
+  display: block !important;
+  background: linear-gradient(to top, #F8F6F2 0%, rgba(248, 246, 242, 0) 100%) !important;
+  height: 3.5rem !important;
+  opacity: 1 !important;
+}
+
+/* --------------------------------------------------------
+   D. TRANSFORM ALL BLACK BOXES & DARK GRADIENTS INTO CRISP WHITE CARDS
+   -------------------------------------------------------- */
+
+/* All dark gradient containers (Why Us, Reviews, About, Client Gallery, Contact, Services) */
+.theme-light [class*="bg-gradient-to-"][class*="from-\[\#202023\]"],
+.theme-light [class*="bg-gradient-to-"][class*="from-\[\#1A1613\]"],
+.theme-light [class*="bg-gradient-to-"][class*="from-\[\#100E0C\]"],
+.theme-light [class*="bg-gradient-to-b from-\[\#202023\]"],
+.theme-light [class*="bg-gradient-to-r from-\[\#202023\]"],
+.theme-light .why-us-card,
+.theme-light .review-card,
+.theme-light .about-feature-card,
+.theme-light .contact-form-card,
+.theme-light .client-login-card,
+.theme-light .services-menu-card,
+.theme-light .services-stats-card {
+  background-image: none !important;
+  background-color: #FFFFFF !important;
+  border-color: #E2DBD0 !important;
+  box-shadow: 0 10px 30px -5px rgba(35, 30, 24, 0.06), 0 0 1px rgba(35, 30, 24, 0.08) !important;
+}
+
+/* Solid dark background overrides for content cards */
+.theme-light .bg-\[\#202023\] {
+  background-color: #FFFFFF !important;
+  border-color: #E2DBD0 !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.08) !important;
+}
+
+.theme-light .bg-\[\#171719\] {
+  background-color: #F8F6F2 !important;
+  border-color: #E2DBD0 !important;
+}
+
+/* Inner nested boxes (e.g. deliverables in service modal, quick contact box) */
+.theme-light .bg-\[\#120F0D\],
+.theme-light .bg-\[\#100E0C\] {
+  background-color: #F8F6F2 !important;
+  border-color: #E2DBD0 !important;
+}
+
+/* About Section Floating Experience Badge */
+.theme-light #about .absolute[class*="bg-\[\#0B0B0D\]"] {
+  background-color: #FFFFFF !important;
+  border-color: #946F2E !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+}
+.theme-light #about .absolute[class*="bg-\[\#0B0B0D\]"] h4,
+.theme-light #about .absolute[class*="bg-\[\#0B0B0D\]"] p {
+  color: #171412 !important;
+  text-shadow: none !important;
+}
+.theme-light #about .absolute[class*="bg-\[\#0B0B0D\]"] .text-\[\#C6A76A\] {
+  color: #946F2E !important;
+}
+
+/* Why-Us & Contact Icon Crests */
+.theme-light [class*="bg-\[\#C6A76A\]\/15"],
+.theme-light [class*="bg-\[\#C6A76A\]\/10"],
+.theme-light #contact .p-3\.5.bg-\[\#202023\] {
+  background-color: #FAF4EB !important;
+  border-color: #E2DBD0 !important;
+  color: #946F2E !important;
+}
+
+/* Client Gallery login credential pills & exit button */
+.theme-light #client-gallery button[class*="bg-\[\#0B0B0D\]"] {
+  background-color: #F8F6F2 !important;
+  border-color: #D6CEC2 !important;
+  color: #946F2E !important;
+}
+.theme-light #client-gallery button[class*="bg-\[\#0B0B0D\]"]:hover {
+  background-color: #FAF4EB !important;
+  border-color: #946F2E !important;
+}
+
+/* Service Detail Modal in Light Mode */
+.theme-light .service-detail-modal {
+  background-color: #FFFFFF !important;
+  color: #171412 !important;
+  border-color: #E2DBD0 !important;
+}
+.theme-light .service-detail-modal h3,
+.theme-light .service-detail-modal h4 {
+  color: #171412 !important;
+}
+.theme-light .service-detail-modal p,
+.theme-light .service-detail-modal li {
+  color: #4A433A !important;
+}
+
+/* --------------------------------------------------------
+   E. ALL PHOTO CARDS & BACKGROUND PICTURES IN LIGHT THEME
+   - Photos remain 100% natural, vibrant and clear
+   - Dark gradient overlays at the bottom remain dark for text readability
+   - All text on photo overlays is strictly pure WHITE or GOLD
+   -------------------------------------------------------- */
+
+/* Photo card containers in Services, Portfolio & Client Gallery */
+.theme-light .service-photo-card,
+.theme-light .portfolio-photo-card,
+.theme-light .service-featured-card,
+.theme-light #portfolio .group.relative,
+.theme-light #services .group.relative {
+  border-color: #E2DBD0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08) !important;
+  background-color: #171412 !important;
+}
+
+.theme-light .service-photo-card:hover,
+.theme-light .portfolio-photo-card:hover,
+.theme-light .service-featured-card:hover,
+.theme-light #portfolio .group.relative:hover,
+.theme-light #services .group.relative:hover {
+  border-color: #C6A76A !important;
+  box-shadow: 0 20px 40px rgba(148, 111, 46, 0.22) !important;
+}
+
+/* HEADINGS on all photo cards (Services & Portfolio) */
+.theme-light .service-photo-card h3,
+.theme-light .service-photo-card h4,
+.theme-light .service-featured-card h3,
+.theme-light .service-featured-card h4,
+.theme-light .portfolio-photo-card h4,
+.theme-light #portfolio .group h4,
+.theme-light #services .group h3,
+.theme-light #services .group h4,
+.theme-light [class*="group"][class*="relative"][class*="overflow-hidden"] [class*="absolute"] h3,
+.theme-light [class*="group"][class*="relative"][class*="overflow-hidden"] [class*="absolute"] h4,
+.theme-light [class*="group"][class*="relative"][class*="overflow-hidden"] [class*="absolute"] h5 {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* DESCRIPTIONS on all photo cards */
+.theme-light .service-photo-card p,
+.theme-light .portfolio-photo-card p,
+.theme-light .service-featured-card p,
+.theme-light #portfolio .group p,
+.theme-light #services .group p,
+.theme-light [class*="group"][class*="relative"][class*="overflow-hidden"] [class*="absolute"] p {
+  color: #F5F0E8 !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* GOLD LABELS & TAGS on all photo cards */
+.theme-light .service-photo-card [class*="text-\[\#C6A76A\]"],
+.theme-light .portfolio-photo-card [class*="text-\[\#C6A76A\]"],
+.theme-light .service-featured-card [class*="text-\[\#C6A76A\]"],
+.theme-light #portfolio .group [class*="text-\[\#C6A76A\]"],
+.theme-light #services .group [class*="text-\[\#C6A76A\]"],
+.theme-light [class*="group"][class*="relative"][class*="overflow-hidden"] [class*="absolute"] [class*="text-\[\#C6A76A\]"] {
+  color: #E0C58F !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* ACTION LINKS on photo cards (e.g. View Experience Details) */
+.theme-light .service-featured-card .inline-flex,
+.theme-light #services .group .inline-flex {
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8) !important;
+}
+.theme-light .service-featured-card .inline-flex:hover,
+.theme-light #services .group .inline-flex:hover {
+  color: #E0C58F !important;
+}
+
+/* Featured Experience badge on photo card */
+.theme-light .service-featured-card [class*="absolute top-4"] {
+  background-color: rgba(17, 14, 12, 0.88) !important;
+  border-color: rgba(198, 167, 106, 0.6) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+.theme-light .service-featured-card [class*="absolute top-4"] span {
+  color: #E0C58F !important;
+  text-shadow: none !important;
+}
+
+/* Client Gallery photo cards */
+.theme-light #client-gallery .aspect-\[4\/5\] {
+  border-color: #E2DBD0 !important;
+  background-color: #171412 !important;
+}
+.theme-light #client-gallery .aspect-\[4\/5\]:hover {
+  border-color: #946F2E !important;
+}
+
+/* --------------------------------------------------------
+   F. GENERAL TYPOGRAPHY, BUTTONS & FORMS IN LIGHT THEME
+   -------------------------------------------------------- */
+.theme-light h1:not(#home h1),
+.theme-light h2:not(#home h2),
+.theme-light h3:not([class*="absolute"] h3):not(.service-photo-card h3):not(.service-featured-card h3),
+.theme-light h4:not([class*="absolute"] h4):not(.service-photo-card h4):not(.portfolio-photo-card h4):not(.service-featured-card h4),
+.theme-light h5:not([class*="absolute"] h5) {
+  color: #171412 !important;
+}
+
+.theme-light p:not(#home p):not([class*="absolute"] p):not(.service-photo-card p):not(.portfolio-photo-card p):not(.service-featured-card p) {
+  color: #4A433A !important;
+}
+
+.theme-light .text-\[\#F5F0E8\]:not(#home *):not([class*="absolute"] *):not(.service-photo-card *):not(.portfolio-photo-card *):not(.service-featured-card *) {
+  color: #171412 !important;
+}
+
+.theme-light .text-\[\#B8B5AF\]:not(#home *):not([class*="absolute"] *):not(.service-photo-card *):not(.portfolio-photo-card *):not(.service-featured-card *) {
+  color: #5C5449 !important;
+}
+
+.theme-light .border-\[\#35332F\] {
+  border-color: #E2DBD0 !important;
+}
+
+.theme-light .divide-\[\#35332F\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #E2DBD0 !important;
+}
+
+/* Rich Royal Bronze Gold in Light Mode */
+.theme-light .text-\[\#C6A76A\]:not(#home *):not([class*="absolute"] *):not(.service-photo-card *):not(.portfolio-photo-card *):not(.service-featured-card *) {
+  color: #946F2E !important;
+}
+
+.theme-light .border-\[\#C6A76A\]:not(#home *) {
+  border-color: #946F2E !important;
+}
+
+/* Primary CTA Buttons in Light Mode */
+.theme-light .bg-\[\#C6A76A\]:not(#home *) {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+.theme-light .bg-\[\#C6A76A\]:not(#home *):hover {
+  background-color: #7D5C22 !important;
+}
+
+.theme-light .hover\:bg-\[\#E0C58F\]:hover:not(#home *) {
+  background-color: #7D5C22 !important;
+}
+
+/* Form Controls in Light Mode */
+.theme-light input,
+.theme-light select,
+.theme-light textarea {
+  background-color: #F8F6F2 !important;
+  color: #171412 !important;
+  border-color: #D6CEC2 !important;
+}
+
+.theme-light select option {
+  background-color: #FFFFFF !important;
+  color: #171412 !important;
+}
+
+.theme-light input:focus,
+.theme-light select:focus,
+.theme-light textarea:focus {
+  background-color: #FFFFFF !important;
+  border-color: #946F2E !important;
+  outline: none !important;
+}
+
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: #9C9488 !important;
+}
+
+/* Portfolio Filter Tabs in Light Mode */
+.theme-light #portfolio button.bg-\[\#171719\] {
+  background-color: #FFFFFF !important;
+  border-color: #E2DBD0 !important;
+  color: #4A433A !important;
+}
+.theme-light #portfolio button.bg-\[\#171719\]:hover {
+  border-color: #946F2E !important;
+  color: #946F2E !important;
+}
+
+/* Theme Switcher Button in Light Mode */
+.theme-light .theme-toggle-btn {
+  background-color: #FFFFFF !important;
+  border-color: #D6CEC2 !important;
+  color: #171412 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+.theme-light .theme-toggle-btn:hover {
+  border-color: #946F2E !important;
+  background-color: #F3EFEA !important;
+}
+
+/* Footer in Light Mode — Crisp White/Ivory Editorial Theme with High-Contrast Text */
+.theme-light footer {
+  background-color: #FFFFFF !important;
+  border-top: 1px solid #E2DBD0 !important;
+  color: #4A433A !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.03) !important;
+}
+
+.theme-light footer .studio-logo-title {
+  background: none !important;
+  -webkit-text-fill-color: #171412 !important;
+  color: #171412 !important;
+  text-shadow: none !important;
+}
+
+.theme-light footer .studio-logo-subline span {
+  color: #946F2E !important;
+}
+
+.theme-light footer a {
+  color: #2D2822 !important;
+  font-weight: 600 !important;
+}
+
+.theme-light footer a:hover {
+  color: #946F2E !important;
+}
+
+.theme-light footer p {
+  color: #4A433A !important;
+  font-weight: 500 !important;
+}
+
+.theme-light footer p.text-\[\#8E8779\] {
+  color: #7A6B58 !important;
+  font-weight: 600 !important;
+}
+
+
+/* ============================================================
+   ADMIN PORTAL — WHITE / LIGHT THEME OVERRIDES
+   Applied when .theme-light is on <html> element
+   ============================================================ */
+
+/* ---- Page Background ---- */
+.theme-light .admin-login-screen,
+.theme-light .admin-dashboard {
+  background-color: #F2EFE9 !important;
+  color: #171412 !important;
+}
+
+/* Ambient glow blobs in login screen */
+.theme-light .admin-login-screen > div[class*="absolute"][class*="blur"] {
+  opacity: 0.08 !important;
+}
+
+/* ---- LOGIN CARD ---- */
+.theme-light .admin-login-card {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Login card — camera icon circle */
+.theme-light .admin-login-card > div:first-child > div:first-child {
+  background-color: #FAF8F5 !important;
+  border-color: #946F2E !important;
+}
+
+/* Login card heading & text */
+.theme-light .admin-login-card h1 {
+  color: #171412 !important;
+}
+.theme-light .admin-login-card p {
+  color: #5C5449 !important;
+}
+
+/* Login form labels */
+.theme-light .admin-login-card label {
+  color: #6B6259 !important;
+}
+
+/* Login input fields */
+.theme-light .admin-login-card input {
+  background-color: #F8F6F2 !important;
+  border-color: #D6CEC2 !important;
+  color: #171412 !important;
+}
+.theme-light .admin-login-card input:focus {
+  background-color: #FFFFFF !important;
+  border-color: #946F2E !important;
+}
+.theme-light .admin-login-card input::placeholder {
+  color: #A89F94 !important;
+}
+
+/* Login submit button */
+.theme-light .admin-login-card button[type="submit"] {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(148, 111, 46, 0.3) !important;
+}
+.theme-light .admin-login-card button[type="submit"]:hover {
+  background-color: #7D5C22 !important;
+}
+
+/* Login divider & footer text */
+.theme-light .admin-login-card [class*="border-t"] {
+  border-color: #E8E2D9 !important;
+}
+.theme-light .admin-login-card [class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-login-card [class*="text-\[#C6A76A\]"] {
+  color: #946F2E !important;
+}
+
+/* ---- TOP NAVIGATION BAR ---- */
+.theme-light .admin-topbar {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-bottom-color: #DDD7CE !important;
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Logo camera icon in topbar */
+.theme-light .admin-topbar > div:first-child > div:first-child {
+  background-color: #FAF8F5 !important;
+  border-color: #946F2E !important;
+}
+
+/* Studio title in topbar */
+.theme-light .admin-topbar h1 {
+  color: #171412 !important;
+}
+.theme-light .admin-topbar p {
+  color: #6B6259 !important;
+}
+
+/* Studio Admin badge */
+.theme-light .admin-topbar [class*="bg-\[#C6A76A\]/20"] {
+  background-color: rgba(148, 111, 46, 0.12) !important;
+  border-color: rgba(148, 111, 46, 0.3) !important;
+  color: #7D5C22 !important;
+}
+
+/* Theme toggle button in topbar */
+.theme-light .admin-topbar button[aria-label] {
+  background-color: #FFFFFF !important;
+  border-color: #D6CEC2 !important;
+  color: #6B6259 !important;
+}
+.theme-light .admin-topbar button[aria-label]:hover {
+  border-color: #946F2E !important;
+  color: #946F2E !important;
+}
+
+/* Open site button in topbar */
+.theme-light .admin-topbar a[target="_blank"] {
+  background-color: #FFFFFF !important;
+  border-color: #D6CEC2 !important;
+  color: #6B6259 !important;
+}
+.theme-light .admin-topbar a[target="_blank"]:hover {
+  color: #946F2E !important;
+  border-color: #946F2E !important;
+}
+
+/* ---- DESKTOP TAB SWITCHER ---- */
+.theme-light .admin-tab-switcher {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+}
+
+/* Inactive tabs */
+.theme-light .admin-tab-switcher button {
+  color: #6B6259 !important;
+}
+.theme-light .admin-tab-switcher button:hover {
+  background-color: #FAF8F5 !important;
+  color: #171412 !important;
+}
+
+/* Active selected tab */
+.theme-light .admin-tab-switcher button[class*="bg-gradient"] {
+  background: linear-gradient(135deg, #946F2E, #7D5C22) !important;
+  color: #FFFFFF !important;
+}
+
+/* ---- MOBILE TAB BAR ---- */
+.theme-light .admin-mobile-tabbar {
+  background-color: #FAF8F5 !important;
+  border-bottom-color: #DDD7CE !important;
+}
+
+/* Inactive mobile tabs */
+.theme-light .admin-mobile-tabbar button[class*="bg-\[#202023\]"] {
+  background-color: #EDE9E2 !important;
+  color: #6B6259 !important;
+}
+
+/* Active mobile tab */
+.theme-light .admin-mobile-tabbar button[class*="bg-\[#C6A76A\]"] {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+/* ---- KPI STAT CARDS ---- */
+.theme-light .admin-kpi-card {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* KPI card text */
+.theme-light .admin-kpi-card p[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-kpi-card p[class*="text-\[#F5F0E8\]"] {
+  color: #171412 !important;
+}
+
+/* KPI icon squares */
+.theme-light .admin-kpi-card > div:last-child {
+  background-color: #F3EFEA !important;
+}
+
+/* ---- SECTION HEADERS (calendar, folders, inquiries panel headers) ---- */
+.theme-light .admin-section-header {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.theme-light .admin-section-header h2 {
+  color: #171412 !important;
+}
+.theme-light .admin-section-header p {
+  color: #7A7268 !important;
+}
+
+/* Month nav bar in calendar header */
+.theme-light .admin-section-header [class*="bg-\[#0B0B0D\]"] {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+}
+.theme-light .admin-section-header button[class*="hover:bg-\[#171719\]"] {
+  color: #5C5449 !important;
+}
+.theme-light .admin-section-header button[class*="hover:bg-\[#171719\]"]:hover {
+  background-color: #DDD7CE !important;
+  color: #171412 !important;
+}
+.theme-light .admin-section-header span[class*="text-\[#F5F0E8\]"] {
+  color: #171412 !important;
+}
+
+/* ---- CALENDAR GRID PANEL ---- */
+.theme-light .admin-calendar-panel {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Day-of-week headers */
+.theme-light .admin-calendar-panel [class*="grid-cols-7"] > span {
+  color: #7A7268 !important;
+}
+.theme-light .admin-calendar-panel span[class*="text-red-400"] {
+  color: #C0392B !important;
+}
+.theme-light .admin-calendar-panel span[class*="text-\[#C6A76A\]"] {
+  color: #946F2E !important;
+}
+
+/* Calendar divider line */
+.theme-light .admin-calendar-panel [class*="border-b"][class*="border-\[#35332F\]"] {
+  border-bottom-color: #E8E2D9 !important;
+}
+
+/* Empty calendar cells */
+.theme-light .admin-calendar-panel [class*="bg-\[#0B0B0D\]/20"] {
+  background-color: #F5F2ED !important;
+}
+
+/* Normal calendar day cells */
+.theme-light .admin-calendar-panel [class*="cursor-pointer"] {
+  background-color: #F8F6F2 !important;
+  border-color: #E2DBD0 !important;
+}
+.theme-light .admin-calendar-panel [class*="cursor-pointer"]:hover {
+  background-color: #EDE9E2 !important;
+  border-color: #946F2E !important;
+}
+
+/* Selected calendar day */
+.theme-light .admin-calendar-panel [class*="bg-\[#C6A76A\]/15"] {
+  background-color: rgba(148, 111, 46, 0.1) !important;
+  border-color: #946F2E !important;
+}
+
+/* Day number text */
+.theme-light .admin-calendar-panel [class*="text-\[#B8B5AF\]"] {
+  color: #9C9488 !important;
+}
+.theme-light .admin-calendar-panel [class*="text-\[#F5F0E8\]"] {
+  color: #2D2822 !important;
+}
+
+/* Event badge in calendar cell */
+.theme-light .admin-calendar-panel [class*="bg-\[#202023\]"][class*="text-\[#C6A76A\]"] {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+  color: #7D5C22 !important;
+}
+
+/* ---- DATE INSPECTOR PANEL ---- */
+.theme-light .admin-date-inspector {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+.theme-light .admin-date-inspector p[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-date-inspector h3 {
+  color: #171412 !important;
+}
+.theme-light .admin-date-inspector p[class*="text-\[#C6A76A\]"] {
+  color: #946F2E !important;
+}
+
+/* Date inspector dividers */
+.theme-light .admin-date-inspector [class*="border-b"][class*="border-\[#35332F\]"],
+.theme-light .admin-date-inspector [class*="border-t"][class*="border-\[#35332F\]"] {
+  border-color: #E8E2D9 !important;
+}
+
+/* "Add booking" small button in inspector header */
+.theme-light .admin-date-inspector button[class*="bg-\[#171719\]"] {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+  color: #2D2822 !important;
+}
+.theme-light .admin-date-inspector button[class*="bg-\[#171719\]"]:hover {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+/* Empty date state box */
+.theme-light .admin-date-inspector [class*="border-dashed"] {
+  background-color: #F8F6F2 !important;
+  border-color: #D6CEC2 !important;
+}
+.theme-light .admin-date-inspector [class*="border-dashed"] p {
+  color: #7A7268 !important;
+}
+.theme-light .admin-date-inspector [class*="bg-\[#C6A76A\]/20"] {
+  background-color: rgba(148, 111, 46, 0.1) !important;
+  border-color: rgba(148, 111, 46, 0.3) !important;
+  color: #2D2822 !important;
+}
+.theme-light .admin-date-inspector [class*="bg-\[#C6A76A\]/20"]:hover {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+/* Individual booking entry in date inspector */
+.theme-light .admin-date-inspector [class*="bg-\[#0B0B0D\]/90"] {
+  background-color: #F8F6F2 !important;
+  border-color: #DDD7CE !important;
+}
+.theme-light .admin-date-inspector [class*="bg-\[#0B0B0D\]/90"]:hover {
+  border-color: #946F2E !important;
+}
+
+/* Event type badge */
+.theme-light .admin-date-inspector [class*="bg-\[#C6A76A\]/20"][class*="text-\[#C6A76A\]"] {
+  background-color: rgba(148, 111, 46, 0.12) !important;
+  border-color: rgba(148, 111, 46, 0.3) !important;
+  color: #7D5C22 !important;
+}
+
+/* Client name in booking */
+.theme-light .admin-date-inspector h4 {
+  color: #171412 !important;
+}
+
+/* Info row text */
+.theme-light .admin-date-inspector [class*="grid"] span,
+.theme-light .admin-date-inspector [class*="grid"] a {
+  color: #5C5449 !important;
+}
+
+/* Crew box */
+.theme-light .admin-date-inspector [class*="bg-\[#202023\]"][class*="text-\[#B8B5AF\]"] {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+  color: #5C5449 !important;
+}
+
+/* Financial row divider */
+.theme-light .admin-date-inspector [class*="pt-2"][class*="border-t"] {
+  border-color: #E8E2D9 !important;
+}
+
+/* Financial text */
+.theme-light .admin-date-inspector span[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-date-inspector span[class*="text-\[#F5F0E8\]"] {
+  color: #171412 !important;
+}
+
+/* Edit/Delete action icons */
+.theme-light .admin-date-inspector button[class*="hover:bg-\[#171719\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-date-inspector button[class*="hover:bg-\[#171719\]"]:hover {
+  background-color: #EDE9E2 !important;
+  color: #171412 !important;
+}
+
+/* Bottom counter footer */
+.theme-light .admin-date-inspector [class*="pt-3"][class*="border-t"] {
+  border-color: #E8E2D9 !important;
+  color: #7A7268 !important;
+}
+
+/* ---- BOOKINGS TABLE PANEL ---- */
+.theme-light .admin-table-panel {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+.theme-light .admin-table-panel h3 {
+  color: #171412 !important;
+}
+.theme-light .admin-table-panel span[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+
+/* Table header row */
+.theme-light .admin-table-panel thead tr {
+  border-bottom-color: #E2DBD0 !important;
+  color: #7A7268 !important;
+}
+
+/* Table dividers */
+.theme-light .admin-table-panel .divide-stone-800\/60 > * + * {
+  border-top-color: #EDE9E2 !important;
+}
+
+/* Table row hover */
+.theme-light .admin-table-panel tr[class*="hover:bg-\[#171719\]/40"]:hover {
+  background-color: #F8F6F2 !important;
+}
+
+/* Table data cells */
+.theme-light .admin-table-panel td[class*="text-\[#C6A76A\]"] {
+  color: #946F2E !important;
+}
+.theme-light .admin-table-panel td[class*="text-\[#F5F0E8\]"] {
+  color: #171412 !important;
+}
+.theme-light .admin-table-panel td[class*="text-\[#B8B5AF\]"] {
+  color: #5C5449 !important;
+}
+
+/* Event type pill in table */
+.theme-light .admin-table-panel span[class*="bg-\[#171719\]"] {
+  background-color: #EDE9E2 !important;
+  color: #2D2822 !important;
+}
+
+/* Table action buttons */
+.theme-light .admin-table-panel button[class*="bg-\[#171719\]"] {
+  background-color: #EDE9E2 !important;
+  color: #2D2822 !important;
+}
+.theme-light .admin-table-panel button[class*="bg-\[#171719\]"]:hover {
+  background-color: #DDD7CE !important;
+}
+.theme-light .admin-table-panel button[class*="bg-\[#C6A76A\]/20"] {
+  background-color: rgba(148, 111, 46, 0.1) !important;
+  color: #7D5C22 !important;
+}
+.theme-light .admin-table-panel button[class*="bg-\[#C6A76A\]/20"]:hover {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+/* ---- INQUIRY CARDS ---- */
+.theme-light .admin-inquiry-card {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.theme-light .admin-inquiry-card h4,
+.theme-light .admin-inquiry-card h3 {
+  color: #171412 !important;
+}
+.theme-light .admin-inquiry-card p {
+  color: #5C5449 !important;
+}
+.theme-light .admin-inquiry-card span[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-inquiry-card span[class*="text-\[#C6A76A\]"] {
+  color: #946F2E !important;
+}
+
+/* Inquiry dividers */
+.theme-light .admin-inquiry-card [class*="border-t"],
+.theme-light .admin-inquiry-card [class*="border-b"] {
+  border-color: #E8E2D9 !important;
+}
+
+/* Empty inquiries placeholder */
+.theme-light [class*="bg-\[#202023\]/40"][class*="rounded-2xl"][class*="border-\[#35332F\]"] {
+  background-color: #F8F6F2 !important;
+  border-color: #DDD7CE !important;
+}
+.theme-light [class*="bg-\[#202023\]/40"][class*="rounded-2xl"][class*="border-\[#35332F\]"] p {
+  color: #7A7268 !important;
+}
+
+/* ---- CLIENT FOLDER CARDS ---- */
+.theme-light .admin-folder-card {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07) !important;
+}
+.theme-light .admin-folder-card:hover {
+  border-color: #946F2E !important;
+}
+
+/* Folder card details body */
+.theme-light .admin-folder-card [class*="p-4"][class*="space-y-3"] {
+  background-color: #FFFFFF !important;
+}
+
+/* Folder detail rows */
+.theme-light .admin-folder-card span[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-folder-card span[class*="text-\[#F5F0E8\]"] {
+  color: #171412 !important;
+}
+.theme-light .admin-folder-card [class*="border-b"][class*="border-\[#35332F\]"] {
+  border-bottom-color: #E8E2D9 !important;
+}
+
+/* Password box in folder card */
+.theme-light .admin-folder-card [class*="bg-\[#0B0B0D\]"][class*="rounded-xl"] {
+  background-color: #F3EFEA !important;
+  border-color: #DDD7CE !important;
+}
+.theme-light .admin-folder-card [class*="bg-\[#0B0B0D\]"][class*="rounded-xl"] span[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+.theme-light .admin-folder-card [class*="bg-\[#0B0B0D\]"][class*="rounded-xl"] button {
+  color: #7A7268 !important;
+}
+.theme-light .admin-folder-card [class*="bg-\[#0B0B0D\]"][class*="rounded-xl"] button:hover {
+  color: #171412 !important;
+}
+
+/* Photo strip border */
+.theme-light .admin-folder-card img[class*="border-\[#35332F\]"] {
+  border-color: #DDD7CE !important;
+}
+
+/* "+N more" counter box */
+.theme-light .admin-folder-card [class*="bg-\[#0B0B0D\]"][class*="border-\[#35332F\]"][class*="rounded-md"] {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+  color: #6B6259 !important;
+}
+
+/* Folder action buttons row */
+.theme-light .admin-folder-card [class*="pt-2"][class*="border-t"] {
+  border-top-color: #E8E2D9 !important;
+}
+.theme-light .admin-folder-card button[class*="bg-\[#171719\]"] {
+  background-color: #EDE9E2 !important;
+  color: #2D2822 !important;
+}
+.theme-light .admin-folder-card button[class*="bg-\[#171719\]"]:hover {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+/* Client ID badge on folder cover */
+.theme-light .admin-folder-card span[class*="bg-\[#0B0B0D\]/80"] {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  border-color: rgba(198, 167, 106, 0.5) !important;
+}
+
+/* Edit/Delete overlay buttons on folder cover */
+.theme-light .admin-folder-card button[class*="bg-\[#0B0B0D\]/80"] {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* ---- MODAL DIALOGS (Booking + Folder) ---- */
+.theme-light .admin-modal {
+  background: #FFFFFF !important;
+  border-color: #DDD7CE !important;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Modal title */
+.theme-light .admin-modal h3 {
+  color: #171412 !important;
+}
+.theme-light .admin-modal p[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+
+/* Modal form labels */
+.theme-light .admin-modal label {
+  color: #5C5449 !important;
+}
+.theme-light .admin-modal label[class*="text-\[#C6A76A\]"] {
+  color: #946F2E !important;
+}
+.theme-light .admin-modal label[class*="text-\[#B8B5AF\]"] {
+  color: #5C5449 !important;
+}
+
+/* Modal form inputs — override global style too */
+.theme-light .admin-modal input,
+.theme-light .admin-modal select,
+.theme-light .admin-modal textarea {
+  background-color: #F8F6F2 !important;
+  border-color: #D6CEC2 !important;
+  color: #171412 !important;
+}
+.theme-light .admin-modal input:focus,
+.theme-light .admin-modal select:focus,
+.theme-light .admin-modal textarea:focus {
+  background-color: #FFFFFF !important;
+  border-color: #946F2E !important;
+}
+.theme-light .admin-modal input::placeholder,
+.theme-light .admin-modal textarea::placeholder {
+  color: #A89F94 !important;
+}
+
+/* Grid section backgrounds in modal */
+.theme-light .admin-modal [class*="bg-\[#0B0B0D\]"][class*="rounded-xl"],
+.theme-light .admin-modal [class*="bg-\[#171719\]"][class*="rounded"] {
+  background-color: #F3EFEA !important;
+  border-color: #DDD7CE !important;
+}
+
+/* Modal dividers */
+.theme-light .admin-modal [class*="border-t"][class*="border-\[#35332F\]"],
+.theme-light .admin-modal [class*="border-b"][class*="border-\[#35332F\]"] {
+  border-color: #E8E2D9 !important;
+}
+
+/* Modal Cancel button */
+.theme-light .admin-modal button[class*="bg-\[#171719\]"] {
+  background-color: #EDE9E2 !important;
+  color: #2D2822 !important;
+  border-color: #D6CEC2 !important;
+}
+.theme-light .admin-modal button[class*="bg-\[#171719\]"]:hover {
+  background-color: #DDD7CE !important;
+}
+
+/* Modal Save button */
+.theme-light .admin-modal button[type="submit"] {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+.theme-light .admin-modal button[type="submit"]:hover {
+  background-color: #7D5C22 !important;
+}
+
+/* Modal close X button */
+.theme-light .admin-modal > button:first-child {
+  background-color: #EDE9E2 !important;
+  color: #5C5449 !important;
+}
+.theme-light .admin-modal > button:first-child:hover {
+  color: #171412 !important;
+}
+
+/* Modal photo preset picker buttons */
+.theme-light .admin-modal button[class*="bg-\[#202023\]"] {
+  background-color: #EDE9E2 !important;
+  border-color: #D6CEC2 !important;
+  color: #5C5449 !important;
+}
+.theme-light .admin-modal button[class*="bg-\[#202023\]"]:hover {
+  border-color: #946F2E !important;
+}
+
+/* Modal + Add photo button */
+.theme-light .admin-modal button[class*="bg-\[#171719\]"][class*="hover:bg-\[#C6A76A\]"] {
+  background-color: #EDE9E2 !important;
+  color: #2D2822 !important;
+}
+.theme-light .admin-modal button[class*="bg-\[#171719\]"][class*="hover:bg-\[#C6A76A\]"]:hover {
+  background-color: #946F2E !important;
+  color: #FFFFFF !important;
+}
+
+/* Download toggle bar in folder modal */
+.theme-light .admin-modal [class*="p-3"][class*="bg-\[#0B0B0D\]"] {
+  background-color: #F3EFEA !important;
+  border-color: #DDD7CE !important;
+}
+.theme-light .admin-modal [class*="p-3"][class*="bg-\[#0B0B0D\]"] span[class*="text-\[#F5F0E8\]"] {
+  color: #171412 !important;
+}
+.theme-light .admin-modal [class*="p-3"][class*="bg-\[#0B0B0D\]"] span[class*="text-\[#B8B5AF\]"] {
+  color: #7A7268 !important;
+}
+
+/* Advance and balance display in booking modal */
+.theme-light .admin-modal [class*="bg-\[#202023\]"][class*="border-emerald-900"] {
+  background-color: #EBF8F3 !important;
+  border-color: #A7DBC5 !important;
+}
+.theme-light .admin-modal [class*="bg-\[#202023\]/60"] {
+  background-color: #FDF8EF !important;
+}
+
+/* ---- GENERAL ADMIN PAGE TEXT OVERRIDES ---- */
+/* These catch any remaining hardcoded dark text that slips through */
+.theme-light .admin-dashboard [class*="text-\[#F5F0E8\]"]:not([class*="absolute"]) {
+  color: #171412 !important;
+}
+.theme-light .admin-dashboard [class*="text-\[#B8B5AF\]"]:not([class*="absolute"]) {
+  color: #6B6259 !important;
+}
+.theme-light .admin-dashboard [class*="text-\[#C6A76A\]"]:not([class*="absolute"]) {
+  color: #946F2E !important;
+}
+.theme-light .admin-dashboard [class*="border-\[#35332F\]"]:not([class*="absolute"]) {
+  border-color: #DDD7CE !important;
+}
+.theme-light .admin-dashboard [class*="bg-\[#0B0B0D\]"]:not(img):not([class*="absolute"]):not([class*="cover"]):not([class*="fixed"]) {
+  background-color: #F3EFEA !important;
+}
+.theme-light .admin-dashboard [class*="bg-\[#171719\]"]:not([class*="absolute"]) {
+  background-color: #EDE9E2 !important;
+}
+.theme-light .admin-dashboard [class*="bg-\[#202023\]"]:not([class*="absolute"]) {
+  background-color: #FFFFFF !important;
+}
+
+/* ---- ADMIN GENERAL HEADINGS ---- */
+.theme-light .admin-dashboard h2,
+.theme-light .admin-dashboard h3,
+.theme-light .admin-dashboard h4 {
+  color: #171412 !important;
+}
+.theme-light .admin-login-screen h2,
+.theme-light .admin-login-screen h3,
+.theme-light .admin-login-screen h4 {
+  color: #171412 !important;
+}
+
+/* ---- BOOKING DETAIL ENTRY (booking inspector card) ---- */
+.theme-light .admin-dashboard [class*="p-4"][class*="rounded-xl"][class*="bg-\[#0B0B0D\]/90"] {
+  background-color: #F8F6F2 !important;
+  border-color: #DDD7CE !important;
+}
+.theme-light .admin-dashboard [class*="p-4"][class*="rounded-xl"][class*="bg-\[#0B0B0D\]/90"] h4 {
+  color: #171412 !important;
+}
