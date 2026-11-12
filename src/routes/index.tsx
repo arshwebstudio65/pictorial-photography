@@ -2,7 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   authenticateClientGallery,
   addStudioInquiry,
+  getStudioReviews,
+  addStudioReview,
   type ClientGalleryFolder,
+  type StudioReview,
 } from "@/lib/studio-store";
 import { useState, useEffect } from "react";
 import {
@@ -252,6 +255,49 @@ export default function Index() {
   }>(null);
 
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  // Client Reviews & Star Rating State
+  const [reviews, setReviews] = useState<StudioReview[]>(() => getStudioReviews());
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [reviewCouple, setReviewCouple] = useState("");
+  const [reviewEvent, setReviewEvent] = useState("Royal Wedding • Mansa, Punjab");
+  const [reviewQuote, setReviewQuote] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+
+  useEffect(() => {
+    setReviews(getStudioReviews());
+  }, []);
+
+  const totalReviewsCount = reviews.length;
+  const averageRating =
+    totalReviewsCount > 0
+      ? (
+          reviews.reduce((sum, item) => sum + (Number(item.rating) || 5), 0) /
+          totalReviewsCount
+        ).toFixed(1)
+      : "5.0";
+
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewCouple.trim() || !reviewQuote.trim()) return;
+    addStudioReview({
+      couple: reviewCouple.trim(),
+      event: reviewEvent.trim() || "Royal Wedding • Mansa, Punjab",
+      quote: reviewQuote.trim(),
+      rating: reviewRating,
+    });
+    setReviews(getStudioReviews());
+    setReviewSuccess(true);
+    setTimeout(() => {
+      setReviewSuccess(false);
+      setIsReviewModalOpen(false);
+      setReviewCouple("");
+      setReviewQuote("");
+      setReviewRating(5);
+    }, 1200);
+  };
 
   // Client Gallery Authentication & Vault State
   const [clientIdInput, setClientIdInput] = useState("");
@@ -897,14 +943,31 @@ export default function Index() {
                   Cinema Gear
                 </div>
               </div>
-              <div>
-                <div className="hero-metric-number font-serif text-lg sm:text-2xl lg:text-3xl font-semibold text-[#C6A76A] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] whitespace-nowrap">
-                  100%
+              <a
+                href="#reviews"
+                className="group block cursor-pointer"
+                title="Click to view client reviews & ratings"
+              >
+                <div className="hero-metric-number font-serif text-lg sm:text-2xl lg:text-3xl font-semibold text-[#C6A76A] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] whitespace-nowrap inline-flex items-center gap-1">
+                  <span>{averageRating}</span>
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-[#C6A76A] text-[#C6A76A] shrink-0" />
                 </div>
-                <div className="hero-metric-label text-[9px] sm:text-[11px] uppercase tracking-wider text-[#D4CEC2] mt-0.5 font-medium drop-shadow">
-                  Delighted
+                <div className="flex items-center justify-center sm:justify-start gap-0.5 mt-0.5 text-[#C6A76A]">
+                  {[1, 2, 3, 4, 5].map((starIdx) => (
+                    <Star
+                      key={starIdx}
+                      className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${
+                        starIdx <= Math.round(Number(averageRating))
+                          ? "fill-[#C6A76A] text-[#C6A76A]"
+                          : "text-[#C6A76A]/35"
+                      }`}
+                    />
+                  ))}
                 </div>
-              </div>
+                <div className="hero-metric-label text-[9px] sm:text-[11px] uppercase tracking-wider text-[#D4CEC2] mt-0.5 font-medium drop-shadow group-hover:text-[#C6A76A] transition-colors whitespace-nowrap">
+                  Star Rating ({totalReviewsCount})
+                </div>
+              </a>
             </div>
           </div>
         </div>
@@ -2207,7 +2270,7 @@ export default function Index() {
       {/* Client Testimonials / Reviews */}
       <section id="reviews" className="py-24 bg-[#171719] border-t border-[#35332F] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-14">
             <span className="text-[#C6A76A] uppercase tracking-[0.28em] text-xs font-semibold font-cinzel">
               Client Testimonials
             </span>
@@ -2222,42 +2285,63 @@ export default function Index() {
             <p className="text-[#B8B5AF] text-sm sm:text-base mt-4 font-light">
               Real reflections of trust, joyful tears, and lifelong memories captured across Punjab.
             </p>
+
+            {/* Live Rating Summary & Send a Review CTA */}
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="review-card inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#202023] border border-[#35332F] shadow-md">
+                <div className="flex items-center gap-1 text-[#C6A76A]">
+                  {[1, 2, 3, 4, 5].map((starIdx) => (
+                    <Star
+                      key={starIdx}
+                      className={`w-4 h-4 ${
+                        starIdx <= Math.round(Number(averageRating))
+                          ? "fill-current"
+                          : "opacity-30"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="font-serif text-base font-bold text-[#F5F0E8]">
+                  {averageRating} / 5.0
+                </span>
+                <span className="text-xs text-[#B8B5AF] border-l border-[#35332F] pl-3">
+                  {totalReviewsCount} Verified Reviews
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(true)}
+                className="inline-flex items-center gap-2 bg-[#C6A76A] hover:bg-[#E0C58F] text-[#0B0B0D] font-cinzel font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-all shadow-lg shadow-[#C6A76A]/25 hover:scale-105"
+              >
+                <Star className="w-4 h-4 fill-current" />
+                <span>Send a Review</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                quote:
-                  "Pictorial Photography covered our Anand Karaj and evening reception in Mansa with such royal grace! The 4K cinematic trailer brought tears to our parents' eyes. Every candid moment was captured without interrupting our rituals.",
-                couple: "Harpreet & Simran Kaur",
-                event: "Royal Wedding • Mansa, Punjab",
-                rating: 5,
-              },
-              {
-                quote:
-                  "The sunset pre-wedding shoot was pure magic! They made us feel so comfortable in front of the camera, and the colors look like an editorial magazine shoot. Our wedding album is the most treasured keepsake in our home.",
-                couple: "Gurinder Singh & Navneet",
-                event: "Pre-Wedding & Wedding • Bathinda",
-                rating: 5,
-              },
-              {
-                quote:
-                  "Hands down the best photography and cinematography team in the region! Unmatched color grading, top-tier cinema lenses, and ultra-fast private gallery delivery. Highly recommended to every couple!",
-                couple: "Amanpreet & Jaspreet",
-                event: "Luxury Wedding • Mansa",
-                rating: 5,
-              },
-            ].map((item, idx) => (
+            {reviews.map((item) => (
               <div
-                key={idx}
+                key={item.id}
                 className="review-card p-8 rounded-2xl bg-gradient-to-b from-[#202023] to-[#100E0C] border border-[#35332F] flex flex-col justify-between hover:border-[#C6A76A]/55 transition-all duration-300 hover:-translate-y-1.5 shadow-[0_16px_36px_rgba(0,0,0,0.7),0_0_20px_rgba(229,196,120,0.12)]"
               >
                 <div>
                   {/* Rating Stars */}
-                  <div className="flex items-center gap-1 mb-4 text-[#C6A76A]">
-                    {[...Array(item.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-1 text-[#C6A76A]">
+                      {[1, 2, 3, 4, 5].map((starIdx) => (
+                        <Star
+                          key={starIdx}
+                          className={`w-4 h-4 ${
+                            starIdx <= item.rating ? "fill-current" : "opacity-25"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs font-serif font-bold text-[#C6A76A]">
+                      {Number(item.rating).toFixed(1)} ★
+                    </span>
                   </div>
                   <p className="text-sm text-[#D8D2C5] font-light leading-relaxed italic">
                     "{item.quote}"
@@ -2278,6 +2362,142 @@ export default function Index() {
             ))}
           </div>
         </div>
+
+        {/* Send a Review Modal */}
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+            <div className="service-detail-modal contact-form-card bg-[#202023] border border-[#35332F] w-full max-w-lg rounded-2xl shadow-2xl p-6 sm:p-8 relative my-8">
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-[#171719] text-[#B8B5AF] hover:text-[#C6A76A] transition"
+                aria-label="Close review modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="text-center mb-6">
+                <span className="text-[11px] font-cinzel uppercase tracking-[0.25em] text-[#C6A76A] font-semibold">
+                  Share Your Experience
+                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl text-[#F5F0E8] mt-1">
+                  Send a Review &amp; Star Rating
+                </h3>
+                <p className="text-xs text-[#B8B5AF] mt-1">
+                  Your feedback and star rating will be added to our website immediately.
+                </p>
+              </div>
+
+              {reviewSuccess ? (
+                <div className="py-10 text-center space-y-3">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h4 className="font-serif text-xl text-[#F5F0E8]">
+                    Thank You For Your Review!
+                  </h4>
+                  <p className="text-xs text-[#B8B5AF]">
+                    Your {reviewRating}-star rating and review have been published.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleReviewSubmit} className="space-y-5">
+                  {/* Interactive Star Rating Selector */}
+                  <div className="text-center p-4 rounded-xl bg-[#171719]/80 border border-[#35332F]">
+                    <label className="block text-xs uppercase tracking-widest text-[#B8B5AF] font-cinzel mb-2">
+                      Select Your Star Rating
+                    </label>
+                    <div className="flex items-center justify-center gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const isFilled = star <= (hoverRating || reviewRating);
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setReviewRating(star)}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            className="p-1 transition-transform hover:scale-125 focus:outline-none"
+                            aria-label={`Rate ${star} stars`}
+                          >
+                            <Star
+                              className={`w-8 h-8 transition-colors ${
+                                isFilled
+                                  ? "fill-[#C6A76A] text-[#C6A76A]"
+                                  : "text-[#B8B5AF]/40"
+                              }`}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="block text-xs font-semibold text-[#C6A76A] mt-2 font-cinzel">
+                      {reviewRating}.0 ★ —{" "}
+                      {reviewRating === 5
+                        ? "Royal & Unforgettable!"
+                        : reviewRating === 4
+                        ? "Wonderful Experience"
+                        : reviewRating === 3
+                        ? "Good Experience"
+                        : reviewRating === 2
+                        ? "Fair"
+                        : "Needs Improvement"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-[#B8B5AF] font-medium mb-1.5">
+                      Your Name / Couple Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={reviewCouple}
+                      onChange={(e) => setReviewCouple(e.target.value)}
+                      placeholder="e.g. Rajveer Singh & Simran Kaur"
+                      className="w-full bg-[#0B0B0D] border border-[#35332F] rounded-lg px-4 py-3 text-sm text-[#F5F0E8] focus:border-[#C6A76A] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-[#B8B5AF] font-medium mb-1.5">
+                      Event &amp; City
+                    </label>
+                    <input
+                      type="text"
+                      value={reviewEvent}
+                      onChange={(e) => setReviewEvent(e.target.value)}
+                      placeholder="e.g. Royal Wedding • Mansa, Punjab"
+                      className="w-full bg-[#0B0B0D] border border-[#35332F] rounded-lg px-4 py-3 text-sm text-[#F5F0E8] focus:border-[#C6A76A] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-[#B8B5AF] font-medium mb-1.5">
+                      Your Review *
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      value={reviewQuote}
+                      onChange={(e) => setReviewQuote(e.target.value)}
+                      placeholder="Share your experience with Pictorial Photography..."
+                      className="w-full bg-[#0B0B0D] border border-[#35332F] rounded-lg px-4 py-3 text-sm text-[#F5F0E8] focus:border-[#C6A76A] outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-[#C6A76A] hover:bg-[#E0C58F] text-[#0B0B0D] font-cinzel font-bold text-xs uppercase tracking-wider py-3.5 px-6 rounded-full transition-all shadow-lg shadow-[#C6A76A]/25 flex items-center justify-center gap-2"
+                  >
+                    <Star className="w-4 h-4 fill-current" />
+                    <span>Post Review &amp; {reviewRating}-Star Rating</span>
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Client Gallery Preview Section */}

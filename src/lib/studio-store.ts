@@ -42,10 +42,20 @@ export interface StudioInquiry {
   status: "New" | "Contacted" | "Booked";
 }
 
+export interface StudioReview {
+  id: string;
+  couple: string;
+  event: string;
+  quote: string;
+  rating: number; // 1 to 5
+  createdAt: string;
+}
+
 const STORAGE_KEYS = {
   BOOKINGS: "pictorial_studio_bookings_v1",
   FOLDERS: "pictorial_client_folders_v1",
   INQUIRIES: "pictorial_studio_inquiries_v1",
+  REVIEWS: "pictorial_studio_reviews_v1",
   ADMIN_AUTH: "pictorial_admin_session_v1",
 };
 
@@ -377,6 +387,72 @@ export function deleteStudioInquiry(id: string): void {
   if (!isBrowser()) return;
   const list = getStudioInquiries().filter((i) => i.id !== id);
   localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify(list));
+}
+
+// CLIENT REVIEWS & STAR RATINGS
+const DEFAULT_REVIEWS: StudioReview[] = [
+  {
+    id: "rev-01",
+    couple: "Harpreet & Simran Kaur",
+    event: "Royal Wedding • Mansa, Punjab",
+    quote:
+      "Pictorial Photography covered our Anand Karaj and evening reception in Mansa with such royal grace! The 4K cinematic trailer brought tears to our parents' eyes. Every candid moment was captured without interrupting our rituals.",
+    rating: 5,
+    createdAt: "2026-11-05",
+  },
+  {
+    id: "rev-02",
+    couple: "Gurinder Singh & Navneet",
+    event: "Pre-Wedding & Wedding • Bathinda",
+    quote:
+      "The sunset pre-wedding shoot was pure magic! They made us feel so comfortable in front of the camera, and the colors look like an editorial magazine shoot. Our wedding album is the most treasured keepsake in our home.",
+    rating: 5,
+    createdAt: "2026-11-02",
+  },
+  {
+    id: "rev-03",
+    couple: "Amanpreet & Jaspreet",
+    event: "Luxury Wedding • Mansa",
+    quote:
+      "Hands down the best photography and cinematography team in the region! Unmatched color grading, top-tier cinema lenses, and ultra-fast private gallery delivery. Highly recommended to every couple!",
+    rating: 5,
+    createdAt: "2026-10-28",
+  },
+];
+
+export function getStudioReviews(): StudioReview[] {
+  if (!isBrowser()) return DEFAULT_REVIEWS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.REVIEWS);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(DEFAULT_REVIEWS));
+      return DEFAULT_REVIEWS;
+    }
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error("Error reading reviews", e);
+    return DEFAULT_REVIEWS;
+  }
+}
+
+export function addStudioReview(
+  review: Omit<StudioReview, "id" | "createdAt">
+): StudioReview {
+  const safeRating = Math.min(5, Math.max(1, Math.round(Number(review.rating) || 5)));
+  const newReview: StudioReview = {
+    id: "rev-" + Date.now(),
+    couple: sanitizeText(review.couple, 100),
+    event: sanitizeText(review.event || "Wedding Shoot • Punjab", 100),
+    quote: sanitizeText(review.quote, 800),
+    rating: safeRating,
+    createdAt: new Date().toISOString().split("T")[0] as string,
+  };
+  if (isBrowser()) {
+    const list = getStudioReviews();
+    list.unshift(newReview);
+    localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(list));
+  }
+  return newReview;
 }
 
 // ADMIN AUTHENTICATION — HARDENED
