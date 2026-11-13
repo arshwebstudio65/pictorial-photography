@@ -880,16 +880,16 @@ export default function Index() {
           />
 
           {/* Top ambient dark gradient for header and navbar readability */}
-          <div className="hero-top-overlay absolute inset-x-0 top-0 h-28 sm:h-36 bg-gradient-to-b from-[#0B0B0D]/85 via-[#0B0B0D]/40 to-transparent" />
+          <div className="hero-top-overlay absolute inset-x-0 top-0 h-14 sm:h-16 bg-gradient-to-b from-[#0B0B0D]/30 via-[#0B0B0D]/10 to-transparent" />
 
-          {/* Desktop Left-to-Right directional fade: Dark on the left behind text, 100% TRANSPARENT on the couple */}
-          <div className="hero-side-overlay hidden sm:block absolute inset-0 bg-gradient-to-r from-[#0B0B0D]/95 via-[#0B0B0D]/60 to-transparent" />
+          {/* Desktop Left-to-Right directional fade: Ultra-subtle behind text, 100% TRANSPARENT on the couple */}
+          <div className="hero-side-overlay hidden sm:block absolute inset-0 bg-gradient-to-r from-[#0B0B0D]/45 via-[#0B0B0D]/18 via-35% to-transparent" />
 
-          {/* Mobile Vertical Gradient: Soft dark fade at bottom behind text, couple clearly visible in open top/middle */}
-          <div className="hero-mobile-overlay sm:hidden absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/85 via-45% to-transparent" />
+          {/* Mobile Vertical Gradient: Soft subtle fade at bottom behind text, couple clearly visible in open top/middle */}
+          <div className="hero-mobile-overlay sm:hidden absolute inset-0 bg-gradient-to-t from-[#0B0B0D]/50 via-[#0B0B0D]/22 via-35% to-transparent" />
 
           {/* Bottom gentle fade to blend seamlessly into services */}
-          <div className="hero-bottom-overlay absolute inset-x-0 bottom-0 h-24 sm:h-36 bg-gradient-to-t from-[#171719] via-[#171719]/70 to-transparent" />
+          <div className="hero-bottom-overlay absolute inset-x-0 bottom-0 h-10 sm:h-12 bg-gradient-to-t from-[#171719]/50 to-transparent" />
         </div>
 
         {/* Hero Content - Perfectly responsive on mobile & desktop */}

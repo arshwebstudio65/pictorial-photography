@@ -377,42 +377,42 @@
 .theme-light .hero-content-box,
 .theme-light #home .hero-content-box {
   background: transparent !important;
-  backdrop-filter: blur(2px) !important;
-  -webkit-backdrop-filter: blur(2px) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
 }
 
-/* Typography in Light Mode Hero - Deep Luxury Charcoal with White Clarity Halo */
+/* Typography in Light Mode Hero - Deep Luxury Charcoal with Clean Subtle Contrast */
 .theme-light #home h1 {
   color: #171412 !important;
-  text-shadow: 0 0 24px rgba(255, 255, 255, 0.98), 0 2px 4px rgba(255, 255, 255, 0.95), 0 0 10px rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.8), 0 0 3px rgba(255, 255, 255, 0.9) !important;
   filter: none !important;
 }
 
 .theme-light #home h1 .italic,
 .theme-light #home .italic {
   color: #946F2E !important;
-  text-shadow: 0 0 24px rgba(255, 255, 255, 0.98), 0 2px 4px rgba(255, 255, 255, 0.95), 0 0 10px rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.8), 0 0 3px rgba(255, 255, 255, 0.9) !important;
   filter: none !important;
 }
 
 .theme-light #home p {
   color: #1F1B18 !important;
-  font-weight: 450 !important;
-  text-shadow: 0 0 18px rgba(255, 255, 255, 0.98), 0 1px 3px rgba(255, 255, 255, 0.95) !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.8), 0 0 2px rgba(255, 255, 255, 0.9) !important;
   filter: none !important;
 }
 
 /* Studio Badge in Light Mode Hero - Semi-Transparent Glass Pill */
 .theme-light #home .hero-studio-badge {
-  background-color: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background-color: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   border-color: #946F2E !important;
   color: #946F2E !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Metrics in Light Mode Hero */
@@ -422,13 +422,13 @@
 
 .theme-light #home .hero-metric-number {
   color: #946F2E !important;
-  text-shadow: 0 0 16px rgba(255, 255, 255, 0.98), 0 1px 3px rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.8) !important;
 }
 
 .theme-light #home .hero-metric-label {
   color: #24201C !important;
   font-weight: 600 !important;
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.98), 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 5px rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Action Buttons in Light Mode Hero */
@@ -446,10 +446,10 @@
 .theme-light #home a.border-\[\#C6A76A\] {
   color: #171412 !important;
   border-color: #946F2E !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
 }
 
 .theme-light #home a.border-\[\#C6A76A\]:hover {
@@ -462,18 +462,16 @@
   color: #946F2E !important;
 }
 
-/* Transparent Overlays in Light Mode:
-   - High transparency everywhere so the photo is 100% visible through the text!
-   - Soft 50% max opacity fade on the left, fading to completely 0% transparent on the right
+/* Ultra-Light Transparent Overlays in Light Mode:
+   - Minimal vignette so the background photo is crystal-clear & vibrant
 */
 .theme-light #home .hero-side-overlay {
   display: block !important;
   background: linear-gradient(
     to right,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.38) 32%,
-    rgba(255, 255, 255, 0.15) 55%,
-    rgba(255, 255, 255, 0) 72%,
+    rgba(255, 255, 255, 0.24) 0%,
+    rgba(255, 255, 255, 0.1) 28%,
+    rgba(255, 255, 255, 0) 48%,
     transparent 100%
   ) !important;
   opacity: 1 !important;
@@ -483,25 +481,24 @@
   display: block !important;
   background: linear-gradient(
     to top,
-    rgba(255, 255, 255, 0.75) 0%,
-    rgba(255, 255, 255, 0.45) 45%,
-    rgba(255, 255, 255, 0.1) 68%,
-    transparent 85%
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.14) 32%,
+    transparent 52%
   ) !important;
   opacity: 1 !important;
 }
 
 .theme-light #home .hero-top-overlay {
   display: block !important;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%) !important;
-  height: 4rem !important;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%) !important;
+  height: 2rem !important;
   opacity: 1 !important;
 }
 
 .theme-light #home .hero-bottom-overlay {
   display: block !important;
-  background: linear-gradient(to top, #F8F6F2 0%, rgba(248, 246, 242, 0) 100%) !important;
-  height: 3.5rem !important;
+  background: linear-gradient(to top, rgba(248, 246, 242, 0.45) 0%, rgba(248, 246, 242, 0) 100%) !important;
+  height: 1.5rem !important;
   opacity: 1 !important;
 }
 
@@ -1589,93 +1586,87 @@
   }
 
   /* 1. HERO SECTION (#home) ON MOBILE:
-     - Dedicated upper portrait frame so the Bride & Groom's turban, faces,
-       jewelry, and clasped hands are 100% unobstructed in the top portion.
-     - Text block sits cleanly below the couple's portrait with a smooth fade,
-       so text NEVER covers the couple's faces! */
+     - Full-bleed background photo shifted upward (-16% top, 116% height) so the
+       couple's turban & faces sit in the open upper area ABOVE the text, while
+       their outfits extend all the way to the bottom of #home!
+     - Ultra-light vignette in both Dark and White themes so the photo stays
+       bright, natural, and never blocked by heavy dark/white overlays. */
   #home {
-    min-height: auto !important;
+    min-height: 84vh !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
-    padding-bottom: 1.5rem !important;
-    background-color: #0B0B0D !important;
-  }
-
-  .theme-light #home {
-    background-color: #FAF8F5 !important;
+    justify-content: flex-end !important;
+    padding-bottom: 1rem !important;
   }
 
   #home .hero-media-frame {
-    position: relative !important;
-    inset: auto !important;
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
-    height: 52vh !important;
-    min-height: 350px !important;
-    max-height: 430px !important;
+    height: 100% !important;
     overflow: hidden !important;
-    flex-shrink: 0 !important;
   }
 
   #home .hero-bg-photo {
     position: absolute !important;
-    top: -14% !important;
+    top: -16% !important;
     left: 0 !important;
     width: 100% !important;
-    height: 120% !important;
+    height: 116% !important;
     object-fit: cover !important;
-    object-position: 48% 32% !important;
+    object-position: 48% 20% !important;
   }
 
-  /* Gentle top vignette for header transition without darkening the couple */
+  /* Minimal top vignette on mobile */
   #home .hero-top-overlay {
-    height: 3rem !important;
+    height: 2rem !important;
     background: linear-gradient(
       to bottom,
-      rgba(11, 11, 13, 0.55) 0%,
+      rgba(11, 11, 13, 0.25) 0%,
       transparent 100%
     ) !important;
   }
 
   .theme-light #home .hero-top-overlay {
-    height: 2.5rem !important;
+    height: 1.75rem !important;
     background: linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.18) 0%,
       transparent 100%
     ) !important;
   }
 
-  /* Only fade the very bottom 26% of the photo into the text container below */
+  /* Subtle, low-opacity bottom vignette on mobile so photo remains visible through text */
   #home .hero-mobile-overlay {
     background: linear-gradient(
       to top,
-      #0B0B0D 0%,
-      rgba(11, 11, 13, 0.72) 15%,
-      rgba(11, 11, 13, 0.2) 28%,
-      transparent 42%
+      rgba(11, 11, 13, 0.48) 0%,
+      rgba(11, 11, 13, 0.24) 32%,
+      rgba(11, 11, 13, 0.05) 50%,
+      transparent 62%
     ) !important;
   }
 
   .theme-light #home .hero-mobile-overlay {
     background: linear-gradient(
       to top,
-      #FAF8F5 0%,
-      rgba(250, 248, 245, 0.78) 15%,
-      rgba(255, 255, 255, 0.22) 28%,
-      transparent 42%
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.16) 32%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 62%
     ) !important;
   }
 
   #home .hero-bottom-overlay {
-    display: none !important;
+    height: 1.25rem !important;
+    opacity: 0.45 !important;
   }
 
-  /* Hero Content Container sits right below the couple's portrait */
+  /* Hero Content Container sits in the lower portion below the couple's faces */
   #home > div.relative.z-10 {
-    margin-top: -3.25rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 3rem !important;
+    margin-top: 0 !important;
+    padding-top: 38vh !important;
+    padding-bottom: 2.75rem !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
