@@ -317,18 +317,278 @@ export function deleteStudioBooking(id: string): void {
   localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(list));
 }
 
-// CLIENT GALLERY FOLDERS
+// CLIENT GALLERY FOLDERS & CROSS-DEVICE CLOUD SYNC
+const CLOUD_SYNC_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1d2cd9c461be8";
+const FOLDERS_VERSION_KEY = "pictorial_folders_v";
+let activeCloudWritePromise: Promise<void> | null = null;
+
+function hasCustomChangesFromDefaults(list: ClientGalleryFolder[]): boolean {
+  if (list.length !== DEFAULT_FOLDERS.length) return true;
+  for (let i = 0; i < DEFAULT_FOLDERS.length; i++) {
+    const def = DEFAULT_FOLDERS[i];
+    const cur = list.find((f) => f.id === def?.id);
+    if (!def || !cur) return true;
+    if (
+      cur.clientId.trim().toUpperCase() !== def.clientId.trim().toUpperCase() ||
+      cur.password.trim() !== def.password.trim() ||
+      cur.clientName.trim() !== def.clientName.trim()
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function photoUrlToKey(url: string): string {
+  if (!url) return "hero";
+  const resolved = resolveStudioPhotoUrl(url);
+  for (const [k, v] of Object.entries(DEFAULT_PHOTOS)) {
+    if (resolved === v || url.includes(k)) return k;
+  }
+  if (url.startsWith("http") && url.length < 45 && !url.includes("|") && !url.includes(",")) {
+    return url;
+  }
+  return "hero";
+}
+
+function keyToPhotoUrl(key: string): string {
+  if (!key) return DEFAULT_PHOTOS.hero;
+  const k = key.trim() as keyof typeof DEFAULT_PHOTOS;
+  if (k in DEFAULT_PHOTOS) {
+    return DEFAULT_PHOTOS[k];
+  }
+  return resolveStudioPhotoUrl(key);
+}
+
+function encodeFolderCompact(f: ClientGalleryFolder): string {
+  const clean = (s: string | undefined, max: number) =>
+    (s || "").replace(/\|/g, " ").trim().slice(0, max);
+  const id = clean(f.id, 20) || "fld-" + Date.now();
+  const cid = clean(f.clientId, 24).toUpperCase();
+  const pwd = clean(f.password, 24);
+  const name = clean(f.clientName, 28);
+  const title = clean(f.eventTitle, 32);
+  const date = clean(f.eventDate, 18);
+  const loc = clean(f.location, 20);
+  const cover = photoUrlToKey(f.coverImage);
+  const photosArr = f.photos && f.photos.length > 0 ? f.photos : [DEFAULT_PHOTOS.hero];
+  const photoKeys = photosArr.slice(0, 8).map(photoUrlToKey).join(",");
+  const selIndices = (f.selectedPhotos || [])
+    .map((sp) => photosArr.findIndex((p) => resolveStudioPhotoUrl(p) === resolveStudioPhotoUrl(sp)))
+    .filter((i) => i >= 0)
+    .join(",");
+  const dl = f.canDownload !== false ? "1" : "0";
+  return [id, cid, pwd, name, title, date, loc, cover, photoKeys, selIndices, dl]
+    .join("|")
+    .slice(0, 245);
+}
+
+function decodeFolderCompact(
+  raw: string,
+  existingLocal: ClientGalleryFolder[]
+): ClientGalleryFolder | null {
+  if (!raw || typeof raw !== "string" || !raw.includes("|")) return null;
+  const parts = raw.split("|");
+  if (parts.length < 8) return null;
+  const [
+    id = "",
+    clientId = "",
+    password = "",
+    clientName = "",
+    eventTitle = "",
+    eventDate = "",
+    location = "",
+    coverKey = "hero",
+    photoKeysCsv = "hero",
+    selIndicesCsv = "",
+    dl = "1",
+  ] = parts;
+  if (!id.trim() || !clientId.trim()) return null;
+
+  const localMatch = existingLocal.find((item) => item.id === id.trim());
+  const cloudPhotos = (photoKeysCsv ? photoKeysCsv.split(",") : ["hero"])
+    .filter(Boolean)
+    .map(keyToPhotoUrl);
+
+  const hasCustomLocalPhotos =
+    localMatch &&
+    localMatch.photos &&
+    localMatch.photos.some((p) => p.startsWith("data:image/"));
+
+  const finalPhotos = hasCustomLocalPhotos
+    ? localMatch.photos
+    : cloudPhotos.length > 0
+      ? cloudPhotos
+      : [DEFAULT_PHOTOS.hero];
+
+  const finalCover =
+    localMatch && localMatch.coverImage?.startsWith("data:image/")
+      ? localMatch.coverImage
+      : keyToPhotoUrl(coverKey);
+
+  let selectedPhotos: string[] = [];
+  if (selIndicesCsv && selIndicesCsv.trim().length > 0) {
+    selectedPhotos = selIndicesCsv
+      .split(",")
+      .map((s) => parseInt(s, 10))
+      .filter((idx) => !isNaN(idx) && idx >= 0 && idx < finalPhotos.length)
+      .map((idx) => finalPhotos[idx] as string);
+  } else if (localMatch?.selectedPhotos) {
+    selectedPhotos = localMatch.selectedPhotos;
+  }
+
+  return {
+    id: id.trim(),
+    clientId: clientId.trim().toUpperCase(),
+    password: password.trim(),
+    clientName: clientName.trim() || localMatch?.clientName || "Client Gallery",
+    eventTitle: eventTitle.trim() || localMatch?.eventTitle || "Wedding Gallery",
+    eventDate: eventDate.trim() || localMatch?.eventDate || "2026",
+    location: location.trim() || localMatch?.location || "Mansa, Punjab",
+    coverImage: finalCover,
+    photos: finalPhotos,
+    selectedPhotos,
+    canDownload: dl !== "0",
+    createdAt: localMatch?.createdAt || "2026-11-05",
+  };
+}
+
+function safeSaveFoldersToLocal(list: ClientGalleryFolder[], versionTimestamp?: number): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
+    if (versionTimestamp !== undefined) {
+      localStorage.setItem(FOLDERS_VERSION_KEY, String(versionTimestamp));
+    }
+  } catch (err) {
+    // If base64 photos exceed localStorage quota, keep credentials & non-oversized photos so username/password update NEVER fails
+    try {
+      const compactList = list.map((f) => ({
+        ...f,
+        coverImage: f.coverImage?.startsWith("data:image/")
+          ? DEFAULT_PHOTOS.hero
+          : f.coverImage,
+        photos:
+          f.photos.filter((p) => !p.startsWith("data:image/")).length > 0
+            ? f.photos.filter((p) => !p.startsWith("data:image/"))
+            : [DEFAULT_PHOTOS.hero],
+      }));
+      localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(compactList));
+      if (versionTimestamp !== undefined) {
+        localStorage.setItem(FOLDERS_VERSION_KEY, String(versionTimestamp));
+      }
+    } catch (innerErr) {
+      console.error("Failed to save folders to localStorage", innerErr);
+    }
+  }
+}
+
+function getNextFolderVersion(): number {
+  const now = Date.now();
+  if (!isBrowser()) return now;
+  const current = Number(localStorage.getItem(FOLDERS_VERSION_KEY) || 0);
+  return Math.max(now, current + 1);
+}
+
+export async function syncFoldersToCloud(
+  foldersInput?: ClientGalleryFolder[],
+  versionOverride?: number
+): Promise<void> {
+  if (typeof fetch === "undefined") return;
+  const v = versionOverride || getNextFolderVersion();
+  if (isBrowser()) {
+    try {
+      localStorage.setItem(FOLDERS_VERSION_KEY, String(v));
+    } catch {
+      // ignore
+    }
+  }
+  const doPut = async () => {
+    try {
+      const list = foldersInput || getClientFolders();
+      const payloadData: Record<string, string> = {
+        v: String(v),
+      };
+      list.slice(0, 15).forEach((f, idx) => {
+        payloadData[`f${idx}`] = encodeFolderCompact(f);
+      });
+      await fetch(CLOUD_SYNC_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "pictorial-studio-db-v1",
+          data: payloadData,
+        }),
+      });
+    } catch (e) {
+      // Ignore network errors in offline/test environments
+    }
+  };
+  activeCloudWritePromise = doPut();
+  await activeCloudWritePromise;
+  activeCloudWritePromise = null;
+}
+
+export async function syncFoldersFromCloud(): Promise<ClientGalleryFolder[]> {
+  if (!isBrowser() || typeof fetch === "undefined") return getClientFolders();
+  try {
+    if (activeCloudWritePromise) {
+      await activeCloudWritePromise;
+    }
+    const res = await fetch(`${CLOUD_SYNC_URL}?t=${Date.now()}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+    if (!res.ok) return getClientFolders();
+    const json = await res.json();
+    const data = json?.data;
+    if (!data || typeof data !== "object") return getClientFolders();
+
+    const localList = getClientFolders();
+    const cloudV = Number(data.v || 0);
+    const localV = Number(localStorage.getItem(FOLDERS_VERSION_KEY) || 0);
+
+    // If this browser already has newer local changes (or pre-existing custom username changes when cloud is at initial v=1), push local changes to cloud!
+    if (
+      (localV > 0 && localV > cloudV) ||
+      (cloudV <= 1 && hasCustomChangesFromDefaults(localList))
+    ) {
+      await syncFoldersToCloud(localList, localV > 1 ? localV : Date.now());
+      return localList;
+    }
+
+    const cloudFolders: ClientGalleryFolder[] = [];
+    for (let i = 0; i < 20; i++) {
+      const raw = data[`f${i}`];
+      if (typeof raw === "string") {
+        const decoded = decodeFolderCompact(raw, localList);
+        if (decoded) cloudFolders.push(decoded);
+      }
+    }
+
+    if (cloudFolders.length > 0) {
+      safeSaveFoldersToLocal(cloudFolders, cloudV);
+      return cloudFolders;
+    }
+    return localList;
+  } catch (e) {
+    return getClientFolders();
+  }
+}
+
 export function getClientFolders(): ClientGalleryFolder[] {
   if (!isBrowser()) return DEFAULT_FOLDERS;
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.FOLDERS);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(DEFAULT_FOLDERS));
+      safeSaveFoldersToLocal(DEFAULT_FOLDERS);
       return DEFAULT_FOLDERS;
     }
     const parsed: ClientGalleryFolder[] = JSON.parse(raw);
     return parsed.map((f) => ({
       ...f,
+      clientId: (f.clientId || "").trim().toUpperCase(),
+      password: (f.password || "").trim(),
       coverImage: resolveStudioPhotoUrl(f.coverImage || f.photos?.[0] || DEFAULT_PHOTOS.hero),
       photos: (f.photos || []).map(resolveStudioPhotoUrl),
       selectedPhotos: (f.selectedPhotos || []).map(resolveStudioPhotoUrl),
@@ -350,24 +610,27 @@ export function saveClientFolder(folder: ClientGalleryFolder): void {
   const cleanSelected = (folder.selectedPhotos || []).map(sanitizePhoto).filter(Boolean);
   const cleanFolder: ClientGalleryFolder = {
     ...folder,
-    clientId: sanitizeText(folder.clientId, 40).toUpperCase(),
-    password: sanitizeText(folder.password, 60),
+    clientId: sanitizeText(folder.clientId, 40).trim().toUpperCase(),
+    password: sanitizeText(folder.password, 60).trim(),
     clientName: sanitizeText(folder.clientName, 120),
     eventTitle: sanitizeText(folder.eventTitle, 150),
     eventDate: sanitizeText(folder.eventDate, 60),
     location: sanitizeText(folder.location, 120),
     coverImage: sanitizePhoto(folder.coverImage || cleanPhotos[0] || DEFAULT_PHOTOS.hero),
-    photos: cleanPhotos,
+    photos: cleanPhotos.length > 0 ? cleanPhotos : [DEFAULT_PHOTOS.hero],
     selectedPhotos: cleanSelected,
   };
   const list = getClientFolders();
   const idx = list.findIndex((f) => f.id === cleanFolder.id);
   if (idx >= 0) {
+    // Completely replace the old folder (including deleting its old clientId) with the updated folder
     list[idx] = cleanFolder;
   } else {
     list.unshift(cleanFolder);
   }
-  localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
+  const nowV = getNextFolderVersion();
+  safeSaveFoldersToLocal(list, nowV);
+  void syncFoldersToCloud(list, nowV);
 }
 
 export function toggleClientSelectedPhoto(
@@ -390,7 +653,9 @@ export function toggleClientSelectedPhoto(
     selectedPhotos: nextSelected,
   };
   list[idx] = updated;
-  localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
+  const nowV = getNextFolderVersion();
+  safeSaveFoldersToLocal(list, nowV);
+  void syncFoldersToCloud(list, nowV);
   return updated;
 }
 
@@ -409,18 +674,31 @@ export function downloadStudioPhoto(photoUrl: string, fileName = "pictorial-phot
 export function deleteClientFolder(id: string): void {
   if (!isBrowser()) return;
   const list = getClientFolders().filter((f) => f.id !== id);
-  localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(list));
+  const nowV = getNextFolderVersion();
+  safeSaveFoldersToLocal(list, nowV);
+  void syncFoldersToCloud(list, nowV);
 }
 
 export function authenticateClientGallery(clientId: string, pass: string): ClientGalleryFolder | null {
   const folders = getClientFolders();
   const trimmedId = clientId.trim().toLowerCase();
-  const trimmedPass = pass.trim();
+  const trimmedPass = pass.trim().toLowerCase();
 
   const found = folders.find(
-    (f) => f.clientId.trim().toLowerCase() === trimmedId && f.password.trim() === trimmedPass
+    (f) =>
+      f.clientId.trim().toLowerCase() === trimmedId &&
+      f.password.trim().toLowerCase() === trimmedPass
   );
   return found || null;
+}
+
+export async function authenticateClientGalleryAsync(
+  clientId: string,
+  pass: string
+): Promise<ClientGalleryFolder | null> {
+  // Always sync latest folders from cloud first so any username/password changed in Admin immediately works on Mobile & Desktop, and old username no longer works
+  await syncFoldersFromCloud();
+  return authenticateClientGallery(clientId, pass);
 }
 
 // INQUIRIES

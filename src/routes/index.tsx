@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   authenticateClientGallery,
+  authenticateClientGalleryAsync,
+  getClientFolders,
+  syncFoldersFromCloud,
   addStudioInquiry,
   getStudioReviews,
   addStudioReview,
@@ -311,6 +314,28 @@ export default function Index() {
   const [activeGalleryLightboxImg, setActiveGalleryLightboxImg] = useState<string | null>(null);
   const [clientGallerySubFolder, setClientGallerySubFolder] = useState<"all" | "selected">("all");
   const [selectionSavedNotice, setSelectionSavedNotice] = useState(false);
+  const [availableDemoFolders, setAvailableDemoFolders] = useState<ClientGalleryFolder[]>(() =>
+    getClientFolders()
+  );
+
+  useEffect(() => {
+    const refreshFolders = () => {
+      setAvailableDemoFolders(getClientFolders());
+      void syncFoldersFromCloud().then((cloudList) => {
+        setAvailableDemoFolders(cloudList);
+      });
+    };
+    refreshFolders();
+    if (typeof window !== "undefined") {
+      window.addEventListener("focus", refreshFolders);
+      window.addEventListener("storage", refreshFolders);
+      return () => {
+        window.removeEventListener("focus", refreshFolders);
+        window.removeEventListener("storage", refreshFolders);
+      };
+    }
+    return undefined;
+  }, []);
 
   const handleToggleSelectPhoto = (photoUrl: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -318,17 +343,22 @@ export default function Index() {
     const updated = toggleClientSelectedPhoto(unlockedGallery.id, photoUrl);
     if (updated) {
       setUnlockedGallery(updated);
+      setAvailableDemoFolders(getClientFolders());
     }
   };
 
-  const handleClientGalleryLogin = (e?: React.FormEvent) => {
+  const handleClientGalleryLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setClientAuthError("");
     if (!clientIdInput.trim() || !clientPasswordInput.trim()) {
       setClientAuthError("ਕਿਰਪਾ ਕਰਕੇ Client ID ਅਤੇ Password ਦੋਵੇਂ ਦਰਜ ਕਰੋ। (Please enter both ID & password)");
       return;
     }
-    const folder = authenticateClientGallery(clientIdInput, clientPasswordInput);
+    // Check latest cloud-synced folders first so any username/password change in Admin works on both Mobile & Desktop, and old username no longer works
+    const folder =
+      (await authenticateClientGalleryAsync(clientIdInput, clientPasswordInput)) ||
+      authenticateClientGallery(clientIdInput, clientPasswordInput);
+    setAvailableDemoFolders(getClientFolders());
     if (folder) {
       setUnlockedGallery(folder);
       setClientGallerySubFolder("all");
@@ -336,7 +366,7 @@ export default function Index() {
       setClientAuthError("");
     } else {
       setClientAuthError(
-        "ਗਲਤ Client ID ਜਾਂ Password। ਕਿਰਪਾ ਕਰਕੇ ਸਹੀ ID/ਪਾਸਵਰਡ ਭਰੋ ਜਾਂ ਸਟੂਡੀਓ ਨਾਲ ਸੰਪਰਕ ਕਰੋ (+91 97005 98098)"
+        "ਗਲਤ Client ID ਜਾਂ Password। ਕਿਰਪਾ ਕਰਕੇ ਨਵਾਂ/ਸਹੀ ID ਅਤੇ ਪਾਸਵਰਡ ਭਰੋ ਜਾਂ ਸਟੂਡੀਓ ਨਾਲ ਸੰਪਰਕ ਕਰੋ (+91 97005 98098)"
       );
     }
   };
@@ -2555,13 +2585,16 @@ export default function Index() {
                 <form onSubmit={handleClientGalleryLogin} className="space-y-4">
                   <div>
                     <label className="block text-[11px] uppercase tracking-wider text-[#B8B5AF] mb-1.5 font-medium">
-                      Client ID
+                      Client ID / Username
                     </label>
                     <input
                       type="text"
                       value={clientIdInput}
                       onChange={(e) => setClientIdInput(e.target.value)}
                       placeholder="e.g. PIC-2026-081"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
                       required
                       className="w-full bg-[#0B0B0D] border border-[#35332F] rounded-xl px-4 py-3 text-sm text-[#F5F0E8] placeholder-[#777064] focus:outline-none focus:border-[#C6A76A] focus:ring-1 focus:ring-[#C6A76A] transition-all"
                     />
@@ -2575,6 +2608,9 @@ export default function Index() {
                       value={clientPasswordInput}
                       onChange={(e) => setClientPasswordInput(e.target.value)}
                       placeholder="••••••••••••"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
                       required
                       className="w-full bg-[#0B0B0D] border border-[#35332F] rounded-xl px-4 py-3 text-sm text-[#F5F0E8] placeholder-[#777064] focus:outline-none focus:border-[#C6A76A] focus:ring-1 focus:ring-[#C6A76A] transition-all"
                     />
@@ -2587,34 +2623,30 @@ export default function Index() {
                   </button>
                 </form>
 
-                {/* Sample credentials demo helper */}
-                <div className="mt-5 pt-4 border-t border-[#35332F] text-center">
-                  <p className="text-[10px] uppercase tracking-wider text-[#8E8779] mb-2 font-cinzel">
-                    Demo Client Vault Quick Fill:
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setClientIdInput("PIC-2026-081");
-                        setClientPasswordInput("simran@2026");
-                      }}
-                      className="text-[11px] px-2.5 py-1 rounded-md bg-[#0B0B0D] border border-[#35332F] hover:border-[#C6A76A] text-[#C6A76A] transition"
-                    >
-                      Harpreet & Simran
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setClientIdInput("PIC-2026-082");
-                        setClientPasswordInput("navneet@2026");
-                      }}
-                      className="text-[11px] px-2.5 py-1 rounded-md bg-[#0B0B0D] border border-[#35332F] hover:border-[#C6A76A] text-[#C6A76A] transition"
-                    >
-                      Gurinder & Navneet
-                    </button>
+                {/* Sample credentials demo helper — dynamically synced with Admin Folders */}
+                {availableDemoFolders.length > 0 && (
+                  <div className="mt-5 pt-4 border-t border-[#35332F] text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[#8E8779] mb-2 font-cinzel">
+                      Demo Client Vault Quick Fill:
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-1.5">
+                      {availableDemoFolders.slice(0, 3).map((demoFolder) => (
+                        <button
+                          key={demoFolder.id}
+                          type="button"
+                          onClick={() => {
+                            setClientIdInput(demoFolder.clientId);
+                            setClientPasswordInput(demoFolder.password);
+                            setClientAuthError("");
+                          }}
+                          className="text-[11px] px-2.5 py-1 rounded-md bg-[#0B0B0D] border border-[#35332F] hover:border-[#C6A76A] text-[#C6A76A] transition"
+                        >
+                          {demoFolder.clientName} ({demoFolder.clientId})
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <p className="text-[11px] text-center text-[#9E9789] mt-4">
                   Need your Client ID or password reset?{" "}

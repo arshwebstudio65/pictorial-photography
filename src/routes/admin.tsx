@@ -57,6 +57,8 @@ import {
   getLockoutRemaining,
   downloadStudioPhoto,
   toggleClientSelectedPhoto,
+  syncFoldersFromCloud,
+  syncFoldersToCloud,
   type BookingEvent,
   type ClientGalleryFolder,
   type StudioInquiry,
@@ -173,6 +175,9 @@ export default function AdminPortal() {
     setBookings(getStudioBookings());
     setFolders(getClientFolders());
     setInquiries(getStudioInquiries());
+    void syncFoldersFromCloud().then((cloudList) => {
+      setFolders(cloudList);
+    });
   };
 
   // Lockout countdown effect
@@ -381,7 +386,7 @@ export default function AdminPortal() {
     setIsFolderModalOpen(true);
   };
 
-  const handleSaveFolder = (e: React.FormEvent) => {
+  const handleSaveFolder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!folderForm.clientId || !folderForm.password || !folderForm.clientName) {
       alert("ਕਿਰਪਾ ਕਰਕੇ Client ID, Password ਅਤੇ Client Name ਭਰੋ!");
@@ -398,13 +403,16 @@ export default function AdminPortal() {
       location: folderForm.location || "Mansa, Punjab",
       coverImage: folderForm.coverImage || folderForm.photos?.[0] || DEFAULT_PHOTOS.hero,
       photos: folderForm.photos && folderForm.photos.length > 0 ? folderForm.photos : [DEFAULT_PHOTOS.hero],
+      selectedPhotos: editingFolder?.selectedPhotos || folderForm.selectedPhotos || [],
       canDownload: folderForm.canDownload ?? true,
       createdAt: folderForm.createdAt || (new Date().toISOString().split("T")[0] as string),
     };
 
     saveClientFolder(updated);
-    loadData();
+    setFolders(getClientFolders());
     setIsFolderModalOpen(false);
+    await syncFoldersToCloud(getClientFolders());
+    setFolders(getClientFolders());
   };
 
   const handleDeleteFolder = (id: string) => {
@@ -506,7 +514,7 @@ export default function AdminPortal() {
   };
 
   const copyCredentials = (folder: ClientGalleryFolder) => {
-    const text = `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ਜੀ! Pictorial Photography Studio ਵਲੋਂ ਤੁਹਾਡੀ ਪ੍ਰਾਈਵੇਟ ਵੈੱਡਿੰਗ ਗੈਲਰੀ ਤਿਆਰ ਹੈ:\n\n🌐 ਵੈੱਬਸਾਈਟ: https://pictorialphotography.in/#client-gallery\n🔑 Client ID: ${folder.clientId}\n🔒 Password: ${folder.password}\n\nਧੰਨਵਾਦ! Pictorial Photography, Mansa (+91 97005 98098)`;
+    const text = `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ਜੀ! Pictorial Photography Studio ਵਲੋਂ ਤੁਹਾਡੀ ਪ੍ਰਾਈਵੇਟ ਵੈੱਡਿੰਗ ਗੈਲਰੀ ਤਿਆਰ ਹੈ:\n\n🌐 ਵੈੱਬਸਾਈਟ: https://pictorial-photography.vercel.app/#client-gallery\n🔑 Client ID: ${folder.clientId}\n🔒 Password: ${folder.password}\n\nਧੰਨਵਾਦ! Pictorial Photography, Mansa (+91 97005 98098)`;
     navigator.clipboard.writeText(text);
     setCopiedId(folder.id);
     setTimeout(() => setCopiedId(null), 3000);
@@ -1423,7 +1431,7 @@ export default function AdminPortal() {
 
                         <a
                           href={`https://wa.me/?text=${encodeURIComponent(
-                            `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ਜੀ! Pictorial Photography Studio ਵਲੋਂ ਤੁਹਾਡੀ ਵੈੱਡਿੰਗ ਗੈਲਰੀ ਦਾ ਲਿੰਕ:\n\n🌐 ਵੈੱਬਸਾਈਟ: https://pictorialphotography.in/#client-gallery\n🔑 Client ID: ${folder.clientId}\n🔒 Password: ${folder.password}\n\nਧੰਨਵਾਦ! Pictorial Photography Studio, Mansa`
+                            `ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ ਜੀ! Pictorial Photography Studio ਵਲੋਂ ਤੁਹਾਡੀ ਵੈੱਡਿੰਗ ਗੈਲਰੀ ਦਾ ਲਿੰਕ:\n\n🌐 ਵੈੱਬਸਾਈਟ: https://pictorial-photography.vercel.app/#client-gallery\n🔑 Client ID: ${folder.clientId}\n🔒 Password: ${folder.password}\n\nਧੰਨਵਾਦ! Pictorial Photography Studio, Mansa`
                           )}`}
                           target="_blank"
                           rel="noreferrer"
