@@ -872,11 +872,11 @@ export default function Index() {
       {/* Hero Section */}
       <section id="home" className="relative min-h-[88vh] sm:min-h-[92vh] flex flex-col justify-end sm:justify-center overflow-hidden bg-[#0B0B0D]">
         {/* Background Photo - Centered on Couple for Both Mobile & Desktop */}
-        <div className="absolute inset-0 z-0">
+        <div className="hero-media-frame absolute inset-0 z-0">
           <img
             src={heroImg}
             alt="Royal Wedding Couple in Mansa - Pictorial Photography"
-            className="w-full h-full object-cover object-[50%_20%] sm:object-[68%_35%] lg:object-[72%_35%] transition-all duration-700"
+            className="hero-bg-photo w-full h-full object-cover object-[50%_20%] sm:object-[68%_35%] lg:object-[72%_35%] transition-all duration-700"
           />
 
           {/* Top ambient dark gradient for header and navbar readability */}

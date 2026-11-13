@@ -1574,3 +1574,295 @@
 .theme-light .admin-dashboard [class*="p-4"][class*="rounded-xl"][class*="bg-\[#0B0B0D\]/90"] h4 {
   color: #171412 !important;
 }
+
+/* ============================================================
+   MOBILE-ONLY LAYOUT & BACKGROUND PHOTO CLARITY (< 640px)
+   - Strictly scoped to @media (max-width: 639px) so Desktop (>= 640px)
+     remains 100% UNCHANGED!
+   - Ensures background photos (couple faces, bridal portraits, ceremonies)
+     and overlaid text are BOTH 100% clear and never block each other on phones.
+   ============================================================ */
+@media (max-width: 639px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+  }
+
+  /* 1. HERO SECTION (#home) ON MOBILE:
+     - Dedicated upper portrait frame so the Bride & Groom's turban, faces,
+       jewelry, and clasped hands are 100% unobstructed in the top portion.
+     - Text block sits cleanly below the couple's portrait with a smooth fade,
+       so text NEVER covers the couple's faces! */
+  #home {
+    min-height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    padding-bottom: 1.5rem !important;
+    background-color: #0B0B0D !important;
+  }
+
+  .theme-light #home {
+    background-color: #FAF8F5 !important;
+  }
+
+  #home .hero-media-frame {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 52vh !important;
+    min-height: 350px !important;
+    max-height: 430px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+
+  #home .hero-bg-photo {
+    position: absolute !important;
+    top: -14% !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 120% !important;
+    object-fit: cover !important;
+    object-position: 48% 32% !important;
+  }
+
+  /* Gentle top vignette for header transition without darkening the couple */
+  #home .hero-top-overlay {
+    height: 3rem !important;
+    background: linear-gradient(
+      to bottom,
+      rgba(11, 11, 13, 0.55) 0%,
+      transparent 100%
+    ) !important;
+  }
+
+  .theme-light #home .hero-top-overlay {
+    height: 2.5rem !important;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.45) 0%,
+      transparent 100%
+    ) !important;
+  }
+
+  /* Only fade the very bottom 26% of the photo into the text container below */
+  #home .hero-mobile-overlay {
+    background: linear-gradient(
+      to top,
+      #0B0B0D 0%,
+      rgba(11, 11, 13, 0.72) 15%,
+      rgba(11, 11, 13, 0.2) 28%,
+      transparent 42%
+    ) !important;
+  }
+
+  .theme-light #home .hero-mobile-overlay {
+    background: linear-gradient(
+      to top,
+      #FAF8F5 0%,
+      rgba(250, 248, 245, 0.78) 15%,
+      rgba(255, 255, 255, 0.22) 28%,
+      transparent 42%
+    ) !important;
+  }
+
+  #home .hero-bottom-overlay {
+    display: none !important;
+  }
+
+  /* Hero Content Container sits right below the couple's portrait */
+  #home > div.relative.z-10 {
+    margin-top: -3.25rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 3rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  #home .hero-studio-badge {
+    margin-bottom: 0.65rem !important;
+    padding: 0.35rem 0.85rem !important;
+    font-size: 9.5px !important;
+    letter-spacing: 0.16em !important;
+  }
+
+  #home h1 {
+    font-size: 1.85rem !important;
+    line-height: 1.15 !important;
+    margin-bottom: 0.65rem !important;
+  }
+
+  #home p {
+    font-size: 0.78rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1.15rem !important;
+  }
+
+  #home .hero-metrics-grid {
+    padding-top: 0.85rem !important;
+    gap: 0.35rem !important;
+  }
+
+  /* 2. SERVICES SECTION (#services) PHOTO CARDS ON MOBILE:
+     - Keep couple & bridal portraits bright and visible in the top 70% of each card.
+     - Restrict dark gradient and text to the bottom 30% of each card. */
+  #services .service-featured-card {
+    height: 400px !important;
+  }
+
+  #services .service-featured-card img {
+    height: 118% !important;
+    margin-top: -12% !important;
+    object-position: 48% 30% !important;
+  }
+
+  #services .service-featured-card > div.bg-gradient-to-t {
+    background: linear-gradient(
+      to top,
+      rgba(11, 11, 13, 0.94) 0%,
+      rgba(11, 11, 13, 0.48) 26%,
+      transparent 45%
+    ) !important;
+    opacity: 1 !important;
+  }
+
+  #services .service-featured-card > div.absolute.bottom-6 {
+    bottom: 1rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+  }
+
+  #services .service-featured-card h3 {
+    font-size: 1.35rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* 2-Photo Split Row in Services on Mobile */
+  #services .grid-cols-2 > div.relative.h-64 img {
+    object-position: center 18% !important;
+  }
+
+  #services .grid-cols-2 > div.relative.h-64 > div.bg-gradient-to-t {
+    background: linear-gradient(
+      to top,
+      rgba(11, 11, 13, 0.92) 0%,
+      rgba(11, 11, 13, 0.38) 28%,
+      transparent 48%
+    ) !important;
+    opacity: 1 !important;
+  }
+
+  /* 6-Photo Editorial Visual Archive Grid on Mobile:
+     Show compact caption at the bottom 30% while keeping top 70% of photo crystal-clear */
+  #services .service-photo-card {
+    height: 220px !important;
+  }
+
+  #services .service-photo-card img {
+    object-position: center 20% !important;
+  }
+
+  #services .service-photo-card > div.absolute.inset-0 {
+    opacity: 1 !important;
+    padding: 0.65rem !important;
+    background: linear-gradient(
+      to top,
+      rgba(11, 11, 13, 0.92) 0%,
+      rgba(11, 11, 13, 0.38) 28%,
+      transparent 48%
+    ) !important;
+  }
+
+  #services .service-photo-card h5 {
+    font-size: 0.85rem !important;
+    line-height: 1.15 !important;
+  }
+
+  /* 3. PORTFOLIO SECTION (#portfolio) CARDS ON MOBILE:
+     - Frame subjects in the clear upper 65% of each card.
+     - Keep gradient and text compact in the bottom 35% so photos are never hidden. */
+  #portfolio .group.relative.rounded-3xl {
+    height: 390px !important;
+  }
+
+  #portfolio .group.relative.rounded-3xl img {
+    object-position: center 20% !important;
+  }
+
+  #portfolio .group.relative.rounded-3xl > div.bg-gradient-to-t,
+  #portfolio .portfolio-photo-card > div.bg-gradient-to-t {
+    background: linear-gradient(
+      to top,
+      rgba(11, 11, 13, 0.95) 0%,
+      rgba(11, 11, 13, 0.52) 28%,
+      rgba(11, 11, 13, 0.1) 42%,
+      transparent 55%
+    ) !important;
+  }
+
+  #portfolio .group.relative.rounded-3xl > div.absolute.bottom-6,
+  #portfolio .group.relative.rounded-3xl > div.absolute.bottom-8 {
+    bottom: 0.9rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+  }
+
+  #portfolio .group.relative.rounded-3xl h3,
+  #portfolio .group.relative.rounded-3xl h4 {
+    font-size: 1.35rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  #portfolio .group.relative.rounded-3xl p {
+    font-size: 0.72rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  #portfolio .group.relative.rounded-3xl button {
+    padding: 0.45rem 0.9rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  /* Tiled Mosaic Gallery cards on Mobile */
+  #portfolio .portfolio-photo-card.rounded-2xl img {
+    object-position: center 20% !important;
+  }
+
+  #portfolio .portfolio-photo-card.rounded-2xl > div.bg-gradient-to-t {
+    background: linear-gradient(
+      to top,
+      rgba(11, 11, 13, 0.92) 0%,
+      rgba(11, 11, 13, 0.35) 28%,
+      transparent 48%
+    ) !important;
+  }
+
+  /* 4. ABOUT SECTION (#about) ON MOBILE:
+     - Prevent floating badge from overflowing off the right edge or blocking the bride portrait */
+  #about img.h-\[520px\] {
+    height: 400px !important;
+    object-position: center 15% !important;
+  }
+
+  #about div.absolute.-bottom-6.-right-6 {
+    bottom: 0.75rem !important;
+    right: 0.75rem !important;
+    left: 0.75rem !important;
+    max-width: none !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* 5. FLOATING WHATSAPP BUTTON ON MOBILE:
+     - Compact size & corner placement so it doesn't cover the Star Rating metric */
+  aside[aria-label="Quick contact"] {
+    bottom: 0.85rem !important;
+    right: 0.85rem !important;
+  }
+
+  aside[aria-label="Quick contact"] a {
+    padding: 0.7rem !important;
+  }
+}
