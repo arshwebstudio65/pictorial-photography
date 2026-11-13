@@ -69,29 +69,28 @@ export const Route = createFileRoute("/admin")({
 });
 
 export default function AdminPortal() {
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("pictorial_theme");
-      if (saved === "light" || saved === "dark") return saved;
-    }
-    return "dark";
-  });
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      if (theme === "light") {
-        document.documentElement.classList.add("theme-light");
-        document.documentElement.classList.remove("theme-dark");
-      } else {
-        document.documentElement.classList.add("theme-dark");
-        document.documentElement.classList.remove("theme-light");
-      }
-      localStorage.setItem("pictorial_theme", theme);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("pictorial_theme");
+      const initial = saved === "light" || saved === "dark" ? saved : "dark";
+      setTheme(initial);
+      document.documentElement.classList.toggle("theme-light", initial === "light");
+      document.documentElement.classList.toggle("theme-dark", initial === "dark");
     }
-  }, [theme]);
+  }, []);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle("theme-light", next === "light");
+        document.documentElement.classList.toggle("theme-dark", next === "dark");
+        localStorage.setItem("pictorial_theme", next);
+      }
+      return next;
+    });
   };
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

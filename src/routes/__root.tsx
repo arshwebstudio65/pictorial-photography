@@ -88,6 +88,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Luxury wedding photography, pre-wedding shoots, and cinematic films in Mansa, Punjab. Preserving your most cherished memories with timeless elegance.",
       },
       { name: "author", content: "Pictorial Photography Mansa" },
+      {
+        name: "keywords",
+        content:
+          "Pictorial Photography Mansa, Best Wedding Photographer in Mansa Punjab, Luxury Punjabi Wedding Photography, Pre-Wedding Shoot Mansa Bathinda, 4K Cinematic Wedding Films Punjab",
+      },
+      { name: "robots", content: "index, follow" },
+      { name: "theme-color", content: "#0B0B0D" },
       { property: "og:title", content: "Pictorial Photography | Luxury Wedding & Cinematic Films" },
       {
         property: "og:description",
@@ -126,11 +133,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("pictorial_theme");document.documentElement.classList.add(t==="light"?"theme-light":"theme-dark")}catch(e){}`,
+          }}
+        />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
         <Scripts />
       </body>

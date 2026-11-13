@@ -208,30 +208,29 @@ function StudioLogo({ size = "default" }: { size?: "default" | "large" }) {
 export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Black and White Theme State
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("pictorial_theme");
-      if (saved === "light" || saved === "dark") return saved;
-    }
-    return "dark";
-  });
+  // Black and White Theme State — SSR-safe initialization to prevent hydration reload
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      if (theme === "light") {
-        document.documentElement.classList.add("theme-light");
-        document.documentElement.classList.remove("theme-dark");
-      } else {
-        document.documentElement.classList.add("theme-dark");
-        document.documentElement.classList.remove("theme-light");
-      }
-      localStorage.setItem("pictorial_theme", theme);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("pictorial_theme");
+      const initial = saved === "light" || saved === "dark" ? saved : "dark";
+      setTheme(initial);
+      document.documentElement.classList.toggle("theme-light", initial === "light");
+      document.documentElement.classList.toggle("theme-dark", initial === "dark");
     }
-  }, [theme]);
+  }, []);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle("theme-light", next === "light");
+        document.documentElement.classList.toggle("theme-dark", next === "dark");
+        localStorage.setItem("pictorial_theme", next);
+      }
+      return next;
+    });
   };
   const [activeCategory, setActiveCategory] = useState("all");
   const [portfolioMode, setPortfolioMode] = useState<"hub" | "marriages" | "cinematic" | "prewedding" | "bridal" | "engagements">("hub");
@@ -263,8 +262,8 @@ export default function Index() {
 
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // Client Reviews & Star Rating State
-  const [reviews, setReviews] = useState<StudioReview[]>(() => getStudioReviews());
+  // Client Reviews & Star Rating State — SSR-safe initialization
+  const [reviews, setReviews] = useState<StudioReview[]>([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
@@ -314,9 +313,7 @@ export default function Index() {
   const [activeGalleryLightboxImg, setActiveGalleryLightboxImg] = useState<string | null>(null);
   const [clientGallerySubFolder, setClientGallerySubFolder] = useState<"all" | "selected">("all");
   const [selectionSavedNotice, setSelectionSavedNotice] = useState(false);
-  const [availableDemoFolders, setAvailableDemoFolders] = useState<ClientGalleryFolder[]>(() =>
-    getClientFolders()
-  );
+  const [availableDemoFolders, setAvailableDemoFolders] = useState<ClientGalleryFolder[]>([]);
 
   useEffect(() => {
     const refreshFolders = () => {
@@ -906,6 +903,8 @@ export default function Index() {
           <img
             src={heroImg}
             alt="Royal Wedding Couple in Mansa - Pictorial Photography"
+            fetchPriority="high"
+            decoding="async"
             className="hero-bg-photo w-full h-full object-cover object-[50%_20%] sm:object-[68%_35%] lg:object-[72%_35%] transition-all duration-700"
           />
 

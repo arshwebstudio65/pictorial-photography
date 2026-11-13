@@ -52,7 +52,29 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const checkedResponse = await normalizeCatastrophicSsrResponse(response);
+
+      // Enable Vercel Edge CDN caching (stale-while-revalidate) on HTML GET requests
+      // so visitors from Google/Mobile get instant <50ms edge responses without serverless cold-start reloads
+      const contentType = checkedResponse.headers.get("content-type") ?? "";
+      if (
+        request.method === "GET" &&
+        checkedResponse.status === 200 &&
+        contentType.includes("text/html")
+      ) {
+        const headers = new Headers(checkedResponse.headers);
+        headers.set(
+          "cache-control",
+          "public, max-age=0, s-maxage=60, stale-while-revalidate=86400"
+        );
+        return new Response(checkedResponse.body, {
+          status: checkedResponse.status,
+          statusText: checkedResponse.statusText,
+          headers,
+        });
+      }
+
+      return checkedResponse;
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
