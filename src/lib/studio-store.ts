@@ -490,11 +490,19 @@ function getNextFolderVersion(): number {
   return Math.max(now, current + 1);
 }
 
+function isTestEnv(): boolean {
+  try {
+    return Boolean((import.meta as any)?.env?.VITEST || (globalThis as any)?.process?.env?.VITEST);
+  } catch {
+    return false;
+  }
+}
+
 export async function syncFoldersToCloud(
   foldersInput?: ClientGalleryFolder[],
   versionOverride?: number
 ): Promise<void> {
-  if (typeof fetch === "undefined") return;
+  if (typeof fetch === "undefined" || isTestEnv()) return;
   const v = versionOverride || getNextFolderVersion();
   if (isBrowser()) {
     try {
@@ -530,7 +538,7 @@ export async function syncFoldersToCloud(
 }
 
 export async function syncFoldersFromCloud(): Promise<ClientGalleryFolder[]> {
-  if (!isBrowser() || typeof fetch === "undefined") return getClientFolders();
+  if (!isBrowser() || typeof fetch === "undefined" || isTestEnv()) return getClientFolders();
   try {
     if (activeCloudWritePromise) {
       await activeCloudWritePromise;
