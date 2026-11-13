@@ -652,6 +652,28 @@
   color: #065F46 !important;
 }
 
+/* Lightbox Select Photo button in Light Mode */
+.theme-light .lightbox-select-btn-inactive,
+.theme-light .lightbox-select-btn-inactive span {
+  background-color: #FFFFFF !important;
+  color: #171412 !important;
+  border-color: #946F2E !important;
+}
+
+.theme-light .lightbox-select-btn-inactive:hover,
+.theme-light .lightbox-select-btn-inactive:hover span {
+  background-color: #059669 !important;
+  color: #FFFFFF !important;
+  border-color: #34D399 !important;
+}
+
+.theme-light .lightbox-select-btn-active,
+.theme-light .lightbox-select-btn-active span {
+  background-color: #059669 !important;
+  color: #FFFFFF !important;
+  border-color: #34D399 !important;
+}
+
 /* Service Detail Modal in Light Mode */
 .theme-light .service-detail-modal {
   background-color: #FFFFFF !important;

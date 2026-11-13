@@ -2927,16 +2927,18 @@ export default function Index() {
                   <button
                     type="button"
                     onClick={() => handleToggleSelectPhoto(activeGalleryLightboxImg)}
-                    className={`px-5 py-2.5 rounded-full font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
+                    className={`px-5 py-2.5 rounded-full font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition shadow-lg ${
                       (unlockedGallery.selectedPhotos || []).includes(activeGalleryLightboxImg)
-                        ? "bg-emerald-600 text-white border border-emerald-400"
-                        : "bg-[#202023] hover:bg-emerald-600 text-white border border-[#35332F]"
+                        ? "lightbox-select-btn-active bg-emerald-600 text-white border border-emerald-400"
+                        : "lightbox-select-btn-inactive bg-[#141416] hover:bg-emerald-600 text-white border border-[#C6A76A]"
                     }`}
                   >
-                    <Check className="w-4 h-4" />
-                    {(unlockedGallery.selectedPhotos || []).includes(activeGalleryLightboxImg)
-                      ? "✓ Added to Selected Folder (Click to Remove)"
-                      : "+ Add to Selected Photos Folder"}
+                    <Check className="w-4 h-4 shrink-0" />
+                    <span>
+                      {(unlockedGallery.selectedPhotos || []).includes(activeGalleryLightboxImg)
+                        ? "✓ Selected in Folder (ਸਿਲੈਕਟ ਹੋ ਗਈ)"
+                        : "+ Select Photo (ਫੋਟੋ ਸਿਲੈਕਟ ਕਰੋ)"}
+                    </span>
                   </button>
                 )}
 
@@ -2948,7 +2950,7 @@ export default function Index() {
                       `${unlockedGallery?.clientId || "pictorial"}-photo.jpg`
                     )
                   }
-                  className="px-5 py-2.5 rounded-full bg-[#C6A76A] hover:bg-[#E0C58F] text-[#0B0B0D] font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition"
+                  className="px-5 py-2.5 rounded-full bg-[#C6A76A] hover:bg-[#E0C58F] text-[#0B0B0D] font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition shadow-lg"
                 >
                   <Download className="w-4 h-4" /> Download Ultra-HD File
                 </button>
