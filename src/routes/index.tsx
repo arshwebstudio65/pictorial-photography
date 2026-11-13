@@ -2704,17 +2704,17 @@ export default function Index() {
               </div>
 
               {/* CLIENT GALLERY FOLDERS BAR: All Event Photos vs Selected Photos Folder */}
-              <div className="bg-[#202023]/90 border border-[#35332F] rounded-2xl p-4 sm:p-5 space-y-4">
+              <div className="client-folders-bar bg-[#202023] border border-[#35332F] rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
                 <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
                     {/* Folder 1: All Photos */}
                     <button
                       type="button"
                       onClick={() => setClientGallerySubFolder("all")}
-                      className={`flex items-center justify-between p-4 rounded-xl border text-left transition ${
+                      className={`client-folder-tab flex items-center justify-between p-4 rounded-xl border text-left transition ${
                         clientGallerySubFolder === "all"
-                          ? "bg-[#C6A76A]/15 border-[#C6A76A] text-[#F5F0E8] shadow-md"
-                          : "bg-[#141416] border-[#35332F] text-[#B8B5AF] hover:border-[#C6A76A]/50"
+                          ? "client-folder-tab-active-all bg-[#C6A76A]/15 border-[#C6A76A] text-[#F5F0E8] shadow-md"
+                          : "client-folder-tab-inactive bg-[#141416] border-[#35332F] text-[#B8B5AF] hover:border-[#C6A76A]/50"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -2722,15 +2722,15 @@ export default function Index() {
                           <Folder className="w-5 h-5" />
                         </div>
                         <div>
-                          <div className="font-cinzel text-xs sm:text-sm font-bold uppercase tracking-wider">
+                          <div className="client-folder-title font-cinzel text-xs sm:text-sm font-bold uppercase tracking-wider">
                             All Event Photos
                           </div>
-                          <div className="text-[11px] text-[#9E9789]">
+                          <div className="client-folder-sub text-[11px] text-[#9E9789]">
                             ਸਾਰੀਆਂ ਫੋਟੋਆਂ • Click ✓ on photos to select
                           </div>
                         </div>
                       </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-[#0B0B0D] border border-[#35332F] font-mono text-xs font-bold text-[#C6A76A]">
+                      <span className="client-folder-count px-2.5 py-1 rounded-lg bg-[#0B0B0D] border border-[#35332F] font-mono text-xs font-bold text-[#C6A76A]">
                         {unlockedGallery.photos.length}
                       </span>
                     </button>
@@ -2739,10 +2739,10 @@ export default function Index() {
                     <button
                       type="button"
                       onClick={() => setClientGallerySubFolder("selected")}
-                      className={`flex items-center justify-between p-4 rounded-xl border text-left transition ${
+                      className={`client-folder-tab flex items-center justify-between p-4 rounded-xl border text-left transition ${
                         clientGallerySubFolder === "selected"
-                          ? "bg-emerald-950/40 border-emerald-500 text-[#F5F0E8] shadow-md"
-                          : "bg-[#141416] border-[#35332F] text-[#B8B5AF] hover:border-emerald-500/50"
+                          ? "client-folder-tab-active-selected bg-emerald-950/40 border-emerald-500 text-[#F5F0E8] shadow-md"
+                          : "client-folder-tab-inactive bg-[#141416] border-[#35332F] text-[#B8B5AF] hover:border-emerald-500/50"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -2750,18 +2750,18 @@ export default function Index() {
                           <Folder className="w-5 h-5" />
                         </div>
                         <div>
-                          <div className="font-cinzel text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-1.5">
+                          <div className="client-folder-title font-cinzel text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-1.5">
                             <span>Selected Photos Folder</span>
-                            <span className="px-1.5 py-0.5 text-[9px] rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span className="client-folder-new-badge px-1.5 py-0.5 text-[9px] rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                               NEW FOLDER
                             </span>
                           </div>
-                          <div className="text-[11px] text-[#9E9789]">
+                          <div className="client-folder-sub text-[11px] text-[#9E9789]">
                             ਚੁਣੀਆਂ ਗਈਆਂ ਫੋਟੋਆਂ ਦਾ ਫੋਲਡਰ (For Studio Owner)
                           </div>
                         </div>
                       </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-[#0B0B0D] border border-emerald-500/40 font-mono text-xs font-bold text-emerald-400">
+                      <span className="client-folder-count-emerald px-2.5 py-1 rounded-lg bg-[#0B0B0D] border border-emerald-500/40 font-mono text-xs font-bold text-emerald-400">
                         {(unlockedGallery.selectedPhotos || []).length}
                       </span>
                     </button>
@@ -2785,7 +2785,7 @@ export default function Index() {
                 </div>
 
                 {selectionSavedNotice && (
-                  <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-600/60 text-emerald-200 text-xs flex items-center justify-between gap-2">
+                  <div className="client-folder-saved-banner p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-600/60 text-emerald-200 text-xs flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span>
@@ -2805,7 +2805,7 @@ export default function Index() {
 
                 if (displayedPhotos.length === 0) {
                   return (
-                    <div className="bg-[#202023]/70 border border-[#35332F] rounded-3xl p-12 text-center space-y-4">
+                    <div className="client-folder-empty bg-[#202023] border border-[#35332F] rounded-3xl p-12 text-center space-y-4">
                       <div className="w-14 h-14 rounded-2xl bg-[#C6A76A]/15 border border-[#C6A76A]/40 flex items-center justify-center mx-auto text-[#C6A76A]">
                         <Folder className="w-7 h-7" />
                       </div>

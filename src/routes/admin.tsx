@@ -1331,11 +1331,11 @@ export default function AdminPortal() {
                         </div>
 
                         {/* Client Selected Photos Folder Box (For Studio Owner Access & Download) */}
-                        <div className="bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-700/50 flex items-center justify-between gap-2 mt-2">
+                        <div className="admin-selected-folder-box bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-700/50 flex items-center justify-between gap-2 mt-2">
                           <div className="flex items-center gap-2">
                             <Folder className="w-4 h-4 text-emerald-400 shrink-0" />
                             <div>
-                              <span className="block text-[11px] font-bold text-emerald-300">
+                              <span className="admin-selected-folder-title block text-[11px] font-bold text-emerald-300">
                                 ਕਲਾਇੰਟ Selected Pics ਫੋਲਡਰ ({(folder.selectedPhotos || []).length})
                               </span>
                               <span className="block text-[10px] text-[#B8B5AF]">

@@ -579,6 +579,79 @@
   border-color: #946F2E !important;
 }
 
+/* Client Gallery Folders Bar & Tabs in Light Mode */
+.theme-light .client-folders-bar,
+.theme-light .client-folder-empty {
+  background-color: #FFFFFF !important;
+  border-color: #E2DBD0 !important;
+  box-shadow: 0 10px 30px -5px rgba(35, 30, 24, 0.06) !important;
+}
+
+.theme-light .client-folder-tab-inactive {
+  background-color: #F8F6F2 !important;
+  border-color: #E2DBD0 !important;
+  color: #171412 !important;
+}
+
+.theme-light .client-folder-tab-inactive:hover {
+  background-color: #FAF4EB !important;
+  border-color: #946F2E !important;
+}
+
+.theme-light .client-folder-tab-active-all {
+  background-color: #FAF3E6 !important;
+  border-color: #946F2E !important;
+  color: #171412 !important;
+}
+
+.theme-light .client-folder-tab-active-selected {
+  background-color: #ECFDF5 !important;
+  border-color: #10B981 !important;
+  color: #171412 !important;
+}
+
+.theme-light .client-folder-title,
+.theme-light .client-folder-title span:first-child {
+  color: #171412 !important;
+}
+
+.theme-light .client-folder-sub {
+  color: #5C5449 !important;
+}
+
+.theme-light .client-folder-new-badge {
+  background-color: #D1FAE5 !important;
+  color: #065F46 !important;
+  border-color: #6EE7B7 !important;
+}
+
+.theme-light .client-folder-count {
+  background-color: #FFFFFF !important;
+  border-color: #D6CEC2 !important;
+  color: #946F2E !important;
+}
+
+.theme-light .client-folder-count-emerald {
+  background-color: #FFFFFF !important;
+  border-color: #6EE7B7 !important;
+  color: #059669 !important;
+}
+
+.theme-light .client-folder-saved-banner {
+  background-color: #ECFDF5 !important;
+  border-color: #6EE7B7 !important;
+  color: #065F46 !important;
+}
+
+.theme-light .admin-selected-folder-box {
+  background-color: #ECFDF5 !important;
+  border-color: #6EE7B7 !important;
+}
+
+.theme-light .admin-selected-folder-title {
+  color: #065F46 !important;
+}
+
 /* Service Detail Modal in Light Mode */
 .theme-light .service-detail-modal {
   background-color: #FFFFFF !important;
